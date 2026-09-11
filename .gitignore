@@ -1,0 +1,15 @@
+# meta-репозиторій кореня: підпроєкти — окремі репозиторії
+/server/
+/workstation/
+/node-sim/
+/node/
+/qgc-plugin/
+.env
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# генерується sync.py на кожній машині (шляхи машинні)
+/CLAUDE.md
+/.agents/
