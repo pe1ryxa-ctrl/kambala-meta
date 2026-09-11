@@ -15,7 +15,7 @@ Move-Item "$env:USERPROFILE\Desktop\Kambala\docs\*" C:\Antigravity\Dev\Kambala\d
 ```
 `sync.py --git-init` створює `<P>\.agents\` (контракт L1, `/task`, правила-скелет, `agents.local.md`), `git init` у трьох підпроєктах,
 і кладе глобальний `AGENTS.md` Gemini + ADLP у `%USERPROFILE%\.gemini\config\` (старий — у `.bak`).
-Потрібен Python 3.11+ і Git for Windows. Не клади проєкт на Desktop/Documents — OneDrive ламає git.
+Потрібен Python 3.8+ і Git for Windows. Не клади проєкт на Desktop/Documents — OneDrive ламає git.
 
 ## Після кожного оновлення kit
 ```powershell
