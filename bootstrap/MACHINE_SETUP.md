@@ -38,11 +38,11 @@ python -m venv %USERPROFILE%\.venvs\kambala-architect
 |---|---|
 | `C:\Antigravity\Dev\l2l1-kit` | `github.com/pe1ryxa-ctrl/l2l1-kit` |
 | `C:\Antigravity\Dev\Kambala` (meta) | `github.com/pe1ryxa-ctrl/kambala-meta` |
-| `C:\Antigravity\Dev\Kambala\node-sim` | ⚠ **немає** |
-| `C:\Antigravity\Dev\Kambala\server` | ⚠ **немає** |
-| `C:\Antigravity\Dev\Kambala\workstation` | ⚠ **немає** |
+| `C:\Antigravity\Dev\Kambala\node-sim` | `github.com/pe1ryxa-ctrl/kambala-node-sim` (приватний) |
+| `C:\Antigravity\Dev\Kambala\server` | `github.com/pe1ryxa-ctrl/kambala-server` (приватний) |
+| `C:\Antigravity\Dev\Kambala\workstation` | `github.com/pe1ryxa-ctrl/kambala-workstation` (приватний) |
 
-⚠ **Підпроєкти без remote існують лише на цьому ПК** — клонуванням на новий ПК вони не переносяться. До перенесення потрібні GitHub-репозиторії для кожного.
+Усі підпроєкти мають приватні репозиторії на GitHub (створено 2026-09-15 через `gh repo create`); L1 пушить у них після кожного коміту.
 
 Порядок на новому ПК: клонувати kit і meta за тими самими шляхами → клонувати підпроєкти всередину meta → у корені meta запустити `python C:\Antigravity\Dev\l2l1-kit\sync.py` → у кожному підпроєкті `python -m venv .venv` і `.venv\Scripts\pip install -e .[dev]` → відновити `.env` із розділу 2.
 
