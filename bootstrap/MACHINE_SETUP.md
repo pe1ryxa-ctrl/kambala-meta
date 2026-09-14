@@ -16,7 +16,7 @@
 | Windows PowerShell | 5.1 | `deploy/push.ps1` підпроєктів | `$PSVersionTable.PSVersion` |
 | Antigravity | — | L1 (Gemini) | — |
 | Claude Desktop | — | L2 (Claude) | — |
-| **GitHub CLI `gh`** | **не встановлено** | створення репозиторіїв підпроєктів, робота з PR | `gh --version` |
+| GitHub CLI `gh` | 2.100.0 (`C:\Program Files\GitHub CLI`, через `winget install --id GitHub.cli`) | створення репозиторіїв підпроєктів, робота з PR; після встановлення — `gh auth login` вручну (Gans) | `gh --version`, `gh auth status` |
 
 Встановлення PyMuPDF у постійне середовище:
 ```
