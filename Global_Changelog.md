@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+### Milestone
+* 2026-09-15 — **перше наскрізне керування на реальному залізі:** TX12 (USB) → `rc` (workstation, KWS-002) → FlyByIP-B → ELRS → приймач → Betaflight; failsafe при втраті пульта. Рішення C (власне РМ без модуля FlyByIP-A) доведено.
+* node-sim емулює FlyByIP-B за виміряною семантикою (KSIM-003); контракт C1/C1a уточнено за залізом (RAW UDP, REST Streamer, два відеовходи).
+* Інфраструктура VPS під git із закріпленням образів за дайджестом, розгорнуто (KSRV-002).
+### Architecture
+* Security baseline вузла: ізоляція MikroTik/WireGuard (лише сервер має доступ до вузла), пароль Streamer не потрібен; SSH Streamer — лише publickey.
+* Lua-меню ELRS переноситься у веб-інтерфейс через протокол параметрів CRSF (KWS-003).
+
 ## [v0.2.0] - 2026-09-15
 ### Milestone
 * **Фаза 0 закрита** (підтвердження Gans): Holy Trinity і скелети `server` (KSRV-001), `node-sim` (KSIM-001), `workstation` (KWS-001) — VERIFIED виконанням.
