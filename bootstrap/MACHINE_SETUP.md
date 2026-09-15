@@ -52,3 +52,4 @@ python -m venv %USERPROFILE%\.venvs\kambala-architect
 - **`python` у деяких оболонках** може вказувати на заглушку Microsoft Store — надійніше викликати повним шляхом.
 - **PowerShell 5.1:** немає `&&`; `.ps1` з кирилицею зберігати в UTF-8 з BOM; не пропускати бінарні дані через конвеєр `|` чи `>` — PowerShell їх перекодовує.
 - **ExecutionPolicy `Restricted`** за замовчуванням: скрипти запускати як `powershell -ExecutionPolicy Bypass -File <скрипт>`.
+- `pyserial` у venv `%USERPROFILE%\.venvs\kambala-architect` (2026-09-15) — опитування Betaflight по MSP через USB VCP (COM10, STM32) для вимірювання затримки керування.
