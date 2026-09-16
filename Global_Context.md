@@ -206,6 +206,17 @@
 
 **Архітектурні рішення для Ground Control Server (затверджено Gans 2026-09-14):** (1) Ground Control працює **контейнером у наявному `compose.yml`** за Caddy (TLS уже вирішено), з **окремою БД і користувачем** у наявному Postgres, віддає `/metrics` у наявний Prometheus; версію Python фіксує образ, системний Python хоста значення не має. (2) **MediaMTX — окремий контейнер у тому ж compose** (вибір MediaMTX — C2). Деталізація — `Context_SRV.md` (KSRV-001). Відкрите питання до вертикалей WireGuard і відео: доступність вузлів у тунелі з bridge-мережі Docker (`wg0` живе на хості).
 
+### Бойова траса керування через релей — стан 2026-09-16 (HIL KSIM-004 / KSRV-003)
+| Елемент | Стан |
+|---|---|
+| VPS `wg0` | піри: ПК `10.66.0.2`, RPi 4 `10.66.0.3`, RPi 5 `10.66.0.10` + `192.168.13.0/24`; конфіг рендериться `infra/wireguard/apply.sh` з `/etc/kambala/wireguard.keys`; `MTU 1380`; маршрут `192.168.13.0/24 dev wg0`. Код `server` на VPS — `/opt/kambala/src` (архів з `origin/main`), compose `/opt/kambala/compose.yml` з `build.context: /opt/kambala/src` |
+| VPS firewall | `nftables` `inet filter input policy drop`: додано `iifname wg0 udp dport 1313 accept` **перед** SSH-ratelimit (`limit rate over 6/minute`) — інакше односпрямований UDP (завжди `ct new`) обмежувався до 6 пакетів/хв; правило і в `/etc/nftables.conf` |
+| Релей | контейнер `relay` (host network), сокет `10.66.0.1:1313`, API `127.0.0.1:8001`; `KSRV_NODES=sim=192.168.13.11`; оператор `10.66.0.3` призначений вузлу `sim` |
+| RPi 5 (вузол) | `deploy/wg-node/`: `wg0 10.66.0.10/16`, forwarding, `nftables` (у `eth0` лише від `10.66.0.1`, з `eth0` лише до `10.66.0.1`), timesyncd на `10.66.0.1`; RPi 4 до FlyByIP-B не дістає (перевірено) |
+| FlyByIP-B | Remote IP/Host `10.66.0.1`, Gateway `192.168.13.10`, port 1313, RAW UDP — прямий шлях зі стенду більше не працює (модуль приймає лише від сервера) |
+| RPi 4 (РМ) | `~/kws` бандл `4fb5b18` + venv (`python-dotenv`), `.env`: ціль `10.66.0.1:1313`, джерело `10.66.0.3:1313`; TX12 по USB; `rc` у стані `link`, слідує SYNC модуля (82 Гц) |
+| Результат | TX12 → RPi 4 → Wi-Fi → VPS → RPi 5 → FlyByIP-B → ELRS: модуль приймає 83 кадри/с, повертає відповіді (~10/с), релей віддає їх оператору; RTT тунелю ~17 мс з обох RPi |
+
 ### Тестовий стенд — Raspberry Pi 5 (`node-sim`)
 | Параметр | Значення |
 |---|---|
