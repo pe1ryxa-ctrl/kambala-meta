@@ -6,9 +6,9 @@ export PYTHONIOENCODING=utf-8; PY="/c/Users/Gans/.venvs/kambala-architect/Script
 RATE="${1:-}"
 stop_all() { ssh $PI 'for p in $(pgrep -f "^/home/gans/kambala/node-sim/.venv/bin/python -m kambala_ws.rc|^python3 /tmp/lat_pi"); do kill $p 2>/dev/null; done; true'; }
 echo "== зупиняю rc/сендери, запускаю lat_pi2 (крен)"; stop_all; sleep 1
-ssh $PI 'nohup python3 /tmp/lat_pi2.py 900 0 > /tmp/lat_pi2.log 2>&1 < /dev/null & disown'
+ssh $PI 'nohup python3 $HOME/tools/lat_pi2.py 900 0 > /tmp/lat_pi2.log 2>&1 < /dev/null & disown'
 echo "== чекаю TX (до 60 с)"
-for i in $(seq 1 30); do ssh $PI 'sudo -n python3 /tmp/sniff_txpower.py 2' | grep -q "TX power: {" && { echo "TX відповідає"; break; }; sleep 2; done
+for i in $(seq 1 30); do ssh $PI 'sudo -n python3 $HOME/tools/sniff_txpower.py 2' | grep -q "TX power: {" && { echo "TX відповідає"; break; }; sleep 2; done
 if [ -n "$RATE" ]; then
   echo "== ставлю Packet Rate idx $RATE (WRITE поле 1, READ через 0.3 с)"
   "$PY" - "$PI_IP" "$RATE" <<'PYEOF'
