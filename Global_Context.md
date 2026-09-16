@@ -24,8 +24,8 @@
 
 4.  **Operator Workstation (`workstation`, KWS)** — Raspberry Pi 4, два дисплеї
     *   **Роль:** робоче місце оператора, ПЗ з нуля. При завантаженні — WireGuard до сервера, автентифікація, запит конфігурації доступних ресурсів.
-    *   **Дисплей 1 (HDMI0) — Flight Display:** повноекранне живе відео з мінімальною затримкою + OSD (напруга АКБ, горизонт, режим, RSSI/LQ, таймер місії, статус боксу).
-    *   **Дисплей 2 (HDMI1):** Фаза 1 — веб-інтерфейс Ground Control (браузер); Фаза 2 — Custom QGC для пілота.
+    *   **Дисплей 1 — Flight Display (рішення Gans 2026-09-16: другий micro-HDMI порт, DRM `HDMI-A-2`; KWS-007):** повноекранне живе відео з мінімальною затримкою + OSD (напруга АКБ, горизонт, режим, RSSI/LQ, таймер місії, статус боксу).
+    *   **Дисплей 2 (перший micro-HDMI порт, `HDMI-A-1`):** Фаза 1 — веб-інтерфейс Ground Control (браузер); Фаза 2 — Custom QGC для пілота.
     *   **Пульт оператора:** RadioMaster TX12/Boxer по USB (HID-джойстик або serial); локальний сервіс читає стіки/тумблери, формує кадри CRSF `RC_CHANNELS_PACKED` і шле по UDP на сервер → релей на `:1313` активного вузла (рішення 2026-09-11, див. C2). У штатній схемі FlyByIP пульт підключається дротом до UART/S-Port модуля **Viewer** (FlyByIP-A), який пакує CRSF в UDP для Streamer; у Kambala окремого Viewer немає — його роль виконує цей сервіс на workstation. Варіант MAVLink Manual Control (режим FBI-B `Mavlink2 → CRSF` по TCP `:1311`) відхилено: UART2 зайнятий мостом до боксів. ⚠ У `docs/technical_specification.md` (§ органи керування) лишилось старе «CRSF або MAVLink Manual Control». Рішення підтверджено 2026-09-15 (варіант C), ризики — у C4.
 
 5.  **QGroundControl plugin (`qgc-plugin`, KQGC)** — Фаза 2
