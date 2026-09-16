@@ -4,7 +4,10 @@ module phase requests ignored (PC may shift phase manually). Control UDP :5005: 
 (+'ack'); b'shift<ms>' delay next frame; b'rate<idx>' write Packet Rate (field 1) then READ after 0.3 s and reply
 b'rate <value>'; b'ping' -> b'pong <period_ms> <shift>'. Throttle/ARM at minimum. Usage: lat_pi2.py [seconds] [ch]"""
 import socket, time, sys, select, struct
-FBI = ("192.168.13.11", 1313); SRC = ("192.168.13.10", 1313); CTRL = ("0.0.0.0", 5005)
+import os
+FBI = (os.environ.get("LAT_TARGET", "192.168.13.11"), 1313)   # FlyByIP-B directly or relay 10.66.0.1
+SRC = (os.environ.get("LAT_SRC", "192.168.13.10"), 1313)      # our source address (must be the module's Remote IP or the relay's operator)
+CTRL = ("0.0.0.0", 5005)
 SECONDS = float(sys.argv[1]) if len(sys.argv) > 1 else 600.0
 CH = int(sys.argv[2]) if len(sys.argv) > 2 else 0
 MIN, MID, MAX = 172, 992, 1811
