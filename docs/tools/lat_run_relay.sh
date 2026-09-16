@@ -3,7 +3,7 @@
 # Stops rc on RPi 4, runs lat_pi2 there as the operator (source 10.66.0.3:1313 -> relay 10.66.0.1:1313),
 # measures with the Betaflight board over USB, then restarts rc. Usage: lat_run_relay.sh [samples=30]
 set -u; export PYTHONIOENCODING=utf-8
-WS=gans@kambala-ws.local; WS_IP="$(ssh gans@kambala-ws.local hostname -I | awk "{print $1}")"; COM=COM10; N="${1:-30}"
+WS=gans@kambala-ws.local; WS_IP="$(ssh gans@kambala-ws.local "hostname -I | cut -d\" \" -f1")"; COM=COM10; N="${1:-30}"
 PY="/c/Users/Gans/.venvs/kambala-architect/Scripts/python.exe"; HERE="$(cd "$(dirname "$0")" && pwd)"
 RC_START='cd ~/kws && PYTHONPATH=~/kws/src nohup .venv/bin/python -m kambala_ws.rc > /tmp/rc_run.log 2>&1 < /dev/null & disown'
 stop_all() { ssh $WS 'for p in $(pgrep -f "python -m kambala_ws.rc|^python3 .*lat_pi2"); do kill $p 2>/dev/null; done; true'; }
