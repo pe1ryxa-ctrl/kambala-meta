@@ -3,8 +3,9 @@
 stamps every decoded frame with the local wall clock at arrival and saves a grayscale crop
 (the area with a burnt-in clock) as PNG named <prefix>_<n>_<HHMMSS.mmm UTC>.png.
 Compare the clock inside the crop with the time in the file name -> latency up to this host.
+Env FS_TRANSPORT=tcp|udp selects the RTSP transport (default tcp).
 Usage: framestamp.py URL WIDTH HEIGHT X Y W H [saves=6] [every=30] [prefix=/tmp/fs]"""
-import struct, subprocess, sys, time, zlib
+import os, struct, subprocess, sys, time, zlib
 from datetime import datetime, timezone
 
 url = sys.argv[1]
@@ -23,7 +24,7 @@ def write_png(path, w, h, gray):
     open(path, "wb").write(png)
 
 
-cmd = ["ffmpeg", "-loglevel", "error", "-fflags", "nobuffer", "-flags", "low_delay", "-rtsp_transport", "tcp",
+cmd = ["ffmpeg", "-loglevel", "error", "-fflags", "nobuffer", "-flags", "low_delay", "-rtsp_transport", os.environ.get("FS_TRANSPORT", "tcp"),
        "-i", url, "-an", "-vf", f"scale={fw}:{fh}", "-pix_fmt", "gray", "-f", "rawvideo", "-"]
 p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 size = fw * fh
