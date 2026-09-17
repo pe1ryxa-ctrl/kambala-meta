@@ -31,7 +31,7 @@ def rc_frame(ch):
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.bind(SRC); s.setblocking(False)
 c = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); c.bind(CTRL); c.setblocking(False)
 ch = [MID] * 16; ch[2] = MIN; ch[4] = MIN; val = MID; ch[CH] = val
-period = 0.022866; t0 = time.monotonic(); nxt = t0; n_tx = n_sync = n_go = 0; last_print = t0; shift_total = 0.0
+period = float(os.environ.get("LAT_PERIOD_MS", "22.866")) / 1000.0; t0 = time.monotonic(); nxt = t0; n_tx = n_sync = n_go = 0; last_print = t0; shift_total = 0.0
 pending = None      # extended frame to send in the next slot instead of RC
 rate_req = None     # [t_read_due, addr, attempts]
 print(f"lat_pi2: -> {FBI}, follows SYNC interval, ch{CH+1} toggles on 'go'", flush=True)
@@ -73,7 +73,9 @@ while time.monotonic() - t0 < SECONDS:
                         c.sendto(b"rate %d" % body[z2 + 1], rate_req[1]); rate_req = None
                 if d[i+2] == 0x3A and ln >= 13 and d[i+5] == 0x10:
                     iv = struct.unpack(">I", d[i+6:i+10])[0] / 10_000_000.0
-                    if 0.004 < iv < 0.1: period = iv; n_sync += 1
+                    if 0.004 < iv < 0.1:
+                        n_sync += 1
+                        if not os.environ.get("LAT_PERIOD_MS"): period = iv
                 i += 2 + ln
         except BlockingIOError: pass
     if now - last_print >= 5.0:
