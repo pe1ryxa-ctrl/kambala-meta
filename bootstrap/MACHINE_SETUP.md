@@ -54,3 +54,4 @@ python -m venv %USERPROFILE%\.venvs\kambala-architect
 - **ExecutionPolicy `Restricted`** за замовчуванням: скрипти запускати як `powershell -ExecutionPolicy Bypass -File <скрипт>`.
 - `pyserial` у venv `%USERPROFILE%\.venvs\kambala-architect` (2026-09-15) — опитування Betaflight по MSP через USB VCP (COM10, STM32) для вимірювання затримки керування.
 - `pymavlink` у venv `%USERPROFILE%\.venvs\kambala-architect` (2026-09-16) — MAVLink до ArduCopter по USB для вимірювання затримки (`docs/tools/lat_pc_mav.py`).
+- **ffmpeg** (2026-09-21): `winget install --id Gyan.FFmpeg -e` — бінарник у `%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg_*fmpeg-*in\`; потрібен для `docs/tools/framestamp.py` і замірів декодування на ПК.
