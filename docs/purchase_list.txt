@@ -42,8 +42,9 @@
 
 СЕРВЕР x1
 
-[ ] Міні-ПК з двома Ethernet — 1 шт. (ціна —)
+[ ] Міні-ПК Intel N100 8/128 ГБ, 4 LAN, fanless — 1 шт. x 12 999 грн = 12 999 грн
+    https://www.olx.ua/d/uk/obyavlenie/kompaktnyy-mini-pk-intel-n100-8gb-128gb-ssd-4-lan-mini-server-openwrt-fanless-ID10Eywt.html
 
 
 
-РАЗОМ (відомі ціни): 62 680 грн
+РАЗОМ (відомі ціни): 75 679 грн
