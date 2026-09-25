@@ -21,7 +21,8 @@
 [ ] CM4 PoE Mini-Computer (20016) — 2 шт. x 3 015 грн = 6 030 грн
     https://evo.net.ua/raspberry-pi-compute-module-4-poe-mini-computer-19883/
 
-[ ] Raspberry Pi CM4004032 — 2 шт. (ціна —)
+[ ] Raspberry Pi CM4004032 — 2 шт. x 11 435 грн = 22 870 грн
+    https://prom.ua/ua/p3140328233-cm4004032-vychislitelnyj-modul.html
 
 
 ВЛАСНИЙ СТРІМЕР x2
@@ -32,4 +33,4 @@
 [ ] Raspberry Pi CM4002016 — 2 шт. (ціна —)
 
 
-РАЗОМ (відомі ціни): 17 152 грн
+РАЗОМ (відомі ціни): 40 022 грн
