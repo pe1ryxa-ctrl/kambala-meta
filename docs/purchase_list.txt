@@ -13,6 +13,7 @@
 [ ] Блок живлення Ritar RTPSP 180-24 (24 В / 7,5 А) — 1 шт.
     https://www.itbox.ua/ua/product/Blok_jhivlennya_dlya_sistem_videosposterejhennya_Ritar_RTPSP_180-24-p988180/
 [ ] Перехідник DC 5.5x2.5 (гніздо) -> 5.5x2.1 (штекер) — 1 шт.
+    https://maxservice.com.ua/ua/perexidnyk-5-5x2-5mm-5-5x2-1mm
 
 [ ] Патч-корд — 112 м
 
