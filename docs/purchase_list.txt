@@ -30,8 +30,8 @@
 
 ВЛАСНИЙ СТРІМЕР x2
 
-[ ] CM4 PoE Mini-Computer (20016) — 2 шт. x 3 015 грн = 6 030 грн
-    https://evo.net.ua/raspberry-pi-compute-module-4-poe-mini-computer-19883/
+[ ] Waveshare CM4-DUAL-ETH-BOX-A-EU — 2 шт. x 6 335 грн = 12 670 грн
+    https://bigl.ua/ua/p3177425939-komplekt-cm4-dual
 
 [ ] Raspberry Pi CM4002016 — 2 шт. x 7 805 грн = 15 610 грн
     https://prom.ua/ua/p3140328230-cm4002016-vychislitelnyj-modul.html
@@ -46,4 +46,4 @@
 
 
 
-РАЗОМ (відомі ціни): 56 040 грн
+РАЗОМ (відомі ціни): 62 680 грн
