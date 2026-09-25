@@ -19,7 +19,7 @@
 | **Не підходить:** TP-Link TL-POE10R | — | [brain.com.ua](https://brain.com.ua/ukr/Splitter_TP-Link_POE10R-p1318366.html) | 659 грн | лише **802.3af** (~12 Вт) — менше за 10–20 Вт бокса |
 | **Не підходить для заряду:** модуль WIZPoE-P1 | — | [docs.wiznet.io](https://docs.wiznet.io/Product/Modules/PoE/WIZPoE-P1) | — | 802.3af, 5 В, до 8 Вт — лише макет без заряду |
 
-**Вузол → бокси:** hEX PoE lite віддає **пасивний** PoE, не 802.3at. Для двох боксів — 2 інжектори 802.3at або малий комутатор PoE+ (рішення Gans відкрите).
+**Вузол → бокси (рішення Gans 2026-09-25): комутатор MikroTik CSS610-8P-2S+IN** — [mikrotik.ua](https://www.mikrotik.ua/product/mikrotik-css610-8p-2s-in), ~9 600–10 350 грн; 8× PoE-out 802.3af/at, бюджет 140 Вт, VLAN (SwOS). hEX PoE lite віддає лише пасивний PoE.
 
 ### РМ оператора ×2 — корпус і плата-носій
 | Що | К-сть | Посилання | Ціна | Чому підходить / застереження |

@@ -13,6 +13,9 @@
 
 [ ] Патч-корд — 112 м
 
+[ ] Комутатор MikroTik CSS610-8P-2S+IN — 1 шт.
+    https://www.mikrotik.ua/product/mikrotik-css610-8p-2s-in
+
 
 РОБОЧЕ МІСЦЕ ОПЕРАТОРА x2
 
