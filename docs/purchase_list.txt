@@ -24,7 +24,8 @@
 [ ] Raspberry Pi CM4004032 — 2 шт. x 11 435 грн = 22 870 грн
     https://prom.ua/ua/p3140328233-cm4004032-vychislitelnyj-modul.html
 
-[ ] Кабель HDMI — 2 шт. (ціна —)
+[ ] Кабель HDMI Merlion 0,3 м — 2 шт. x 99 грн = 198 грн
+    https://comfy.ua/ua/kabel-hdmi-merlion-hdmi-hdmi-high-speed-0-3m-v1-4-black-yt-hdmi-m-m-hs-0-3m.html
 
 
 ВЛАСНИЙ СТРІМЕР x2
@@ -38,4 +39,4 @@
     https://prom.ua/ua/p513279719-splitter-poe-dlya.html
 
 
-РАЗОМ (відомі ціни): 40 337 грн
+РАЗОМ (відомі ціни): 40 535 грн
