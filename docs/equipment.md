@@ -18,7 +18,7 @@
 | **Не підходить:** TP-Link TL-POE10R | — | [brain.com.ua](https://brain.com.ua/ukr/Splitter_TP-Link_POE10R-p1318366.html) | 659 грн | лише **802.3af** (~12 Вт) — менше за 10–20 Вт бокса |
 | **Не підходить для заряду:** модуль WIZPoE-P1 | — | [docs.wiznet.io](https://docs.wiznet.io/Product/Modules/PoE/WIZPoE-P1) | — | 802.3af, 5 В, до 8 Вт — лише макет без заряду |
 
-**Вузол → бокси (рішення Gans 2026-09-25): пасивний PoE 24 В від hEX PoE lite**, два вільні порти; БЖ hEX — [Ritar RTPSP 180-24](https://www.itbox.ua/ua/product/Blok_jhivlennya_dlya_sistem_videosposterejhennya_Ritar_RTPSP_180-24-p988180/) (24 В / 7,5 А, 792 грн) + перехідник 5,5×2,5 → 5,5×2,1: штекер БЖ 2,5 мм, гніздо hEX — під штир 2,1 мм. У боксі — [пасивний сплітер](https://prom.ua/ua/p513279719-splitter-poe-dlya.html) (до 50 В) → далі живлення в боксі — рішення Gans (DC-DC 24→12 В і BEC 5V прибрано зі списку 2026-09-25). Сплітери DTC 802.3at і комутатор CSS610 — **відхилено** (дорого, завелико для двох боксів).
+**Вузол → бокси (рішення Gans 2026-09-25): пасивний PoE 24 В від hEX PoE lite**, два вільні порти; БЖ hEX — [Ritar RTPSP 180-24](https://www.itbox.ua/ua/product/Blok_jhivlennya_dlya_sistem_videosposterejhennya_Ritar_RTPSP_180-24-p988180/) (24 В / 7,5 А, 792 грн) + перехідник 5,5×2,5 → 5,5×2,1: штекер БЖ 2,5 мм, гніздо hEX — під штир 2,1 мм. У боксі — [пасивний сплітер](https://prom.ua/ua/p513279719-splitter-poe-dlya.html) (до 50 В) → DC-DC 24→12 В + BEC 5V (**уже є**, Gans 2026-09-25 — не купуємо). Сплітери DTC 802.3at і комутатор CSS610 — **відхилено** (дорого, завелико для двох боксів).
 
 ### РМ оператора ×2 — корпус і плата-носій
 | Що | К-сть | Посилання | Ціна | Чому підходить / застереження |
@@ -163,4 +163,4 @@
 - **Апаратний носій для кореневого ключа провіжингу** (офлайн) — там же.
 
 ## 4. Уже є на стенді
-Пульт RadioMaster TX12, модуль ES900TX (MilELRS), Raspberry Pi 4 (робоче місце, два екрани), Raspberry Pi 5 (node-sim), MikroTik, FlyByIP Streamer (CM4) і FlyByIP-B, USB-флешка на РМ (запис відео, KWS-020).
+Пульт RadioMaster TX12, модуль ES900TX (MilELRS), Raspberry Pi 4 (робоче місце, два екрани), Raspberry Pi 5 (node-sim), MikroTik, FlyByIP Streamer (CM4) і FlyByIP-B, USB-флешка на РМ (запис відео, KWS-020). DC-DC 24→12 В і BEC 5V для боксів.
