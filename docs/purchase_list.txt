@@ -5,15 +5,11 @@
 [ ] WIZnet W55RP20-EVB-Pico — 3 шт. x 1 311 грн = 3 933 грн
     https://prom.ua/ua/m3647591317898846658-wiznet-w55rp20-evb.html
 
-[ ] Пасивний PoE інжектор + сплітер 5.5x2.1 (комплект) — 3 компл. x 105 грн = 315 грн
-    https://prom.ua/ua/p513279719-splitter-poe-dlya.html
-
 [ ] Блок живлення Ritar RTPSP 180-24 (24 В / 7,5 А) — 1 шт. x 792 грн = 792 грн
     https://www.itbox.ua/ua/product/Blok_jhivlennya_dlya_sistem_videosposterejhennya_Ritar_RTPSP_180-24-p988180/
+
 [ ] Перехідник DC 5.5x2.5 (гніздо) -> 5.5x2.1 (штекер) — 1 шт. x 52 грн = 52 грн
     https://maxservice.com.ua/ua/perexidnyk-5-5x2-5mm-5-5x2-1mm
-
-[ ] Патч-корд — 118 м (ціна —)
 
 
 РОБОЧЕ МІСЦЕ ОПЕРАТОРА x2
@@ -27,9 +23,6 @@
 [ ] Кабель HDMI Merlion 0,3 м — 2 шт. x 99 грн = 198 грн
     https://comfy.ua/ua/kabel-hdmi-merlion-hdmi-hdmi-high-speed-0-3m-v1-4-black-yt-hdmi-m-m-hs-0-3m.html
 
-[ ] Yubico Security Key NFC (USB-A), прошивка 5.4.3 — 2 шт. x 1 699 грн = 3 398 грн
-    https://techwarehouse.com.ua/ua/p3119863620-apparatnyj-klyuch-bezopasnosti.html
-
 
 ВЛАСНИЙ СТРІМЕР x2
 
@@ -39,9 +32,6 @@
 [ ] Raspberry Pi CM4002016 — 2 шт. x 7 805 грн = 15 610 грн
     https://prom.ua/ua/p3140328230-cm4002016-vychislitelnyj-modul.html
 
-[ ] Пасивний PoE інжектор + сплітер 5.5x2.1 (комплект) — 2 компл. x 105 грн = 210 грн
-    https://prom.ua/ua/p513279719-splitter-poe-dlya.html
-
 
 СЕРВЕР x1
 
@@ -49,11 +39,21 @@
     https://www.olx.ua/d/uk/obyavlenie/kompaktnyy-mini-pk-intel-n100-8gb-128gb-ssd-4-lan-mini-server-openwrt-fanless-ID10Eywt.html
 
 
-
 РОБОЧЕ МІСЦЕ АДМІНІСТРАТОРА x1
 
-[ ] Yubico Security Key NFC (USB-A), прошивка 5.4.3 — 2 шт. x 1 699 грн = 3 398 грн
+[ ] Ноутбук Thomson Neo N14 (MEAN14C8SL256S) — 1 шт. x 10 499 грн = 10 499 грн
+    https://rozetka.com.ua/ua/thomson-mean14c8sl256s/p495491574/
+
+
+СПІЛЬНЕ
+
+[ ] Yubico Security Key NFC (USB-A), прошивка 5.4.3 — 4 шт. x 1 699 грн = 6 796 грн
     https://techwarehouse.com.ua/ua/p3119863620-apparatnyj-klyuch-bezopasnosti.html
 
+[ ] Пасивний PoE інжектор + сплітер 5.5x2.1 (комплект) — 5 компл. x 105 грн = 525 грн
+    https://prom.ua/ua/p513279719-splitter-poe-dlya.html
 
-РАЗОМ (відомі ціни): 82 475 грн
+[ ] Патч-корд — 118 м (ціна —)
+
+
+РАЗОМ (відомі ціни): 92 974 грн
