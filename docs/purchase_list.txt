@@ -12,7 +12,9 @@
 
 [ ] BEC 5V — 3 шт.
 
-[ ] Блок живлення 24 В / 5 А для hEX, штекер 5.5x2.1 (Mean Well GST120A24-P1J) — 1 шт.
+[ ] Блок живлення Ritar RTPSP 180-24 (24 В / 7,5 А) — 1 шт.
+    https://www.itbox.ua/ua/product/Blok_jhivlennya_dlya_sistem_videosposterejhennya_Ritar_RTPSP_180-24-p988180/
+[ ] Перехідник DC 5.5x2.5 (гніздо) -> 5.5x2.1 (штекер) — 1 шт.
 
 [ ] Патч-корд — 112 м
 
