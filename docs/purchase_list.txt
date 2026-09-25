@@ -2,23 +2,26 @@
 
 БОКСИ x2
 
-[ ] WIZnet W55RP20-EVB-Pico — 3 шт.
+[ ] WIZnet W55RP20-EVB-Pico — 3 шт. x 1 311 грн = 3 933 грн
     https://prom.ua/ua/m3647591317898846658-wiznet-w55rp20-evb.html
 
-[ ] Пасивний PoE інжектор + сплітер 5.5x2.1 (комплект) — 3 компл.
+[ ] Пасивний PoE інжектор + сплітер 5.5x2.1 (комплект) — 3 компл. x 105 грн = 315 грн
     https://prom.ua/ua/p513279719-splitter-poe-dlya.html
 
-[ ] Блок живлення Ritar RTPSP 180-24 (24 В / 7,5 А) — 1 шт.
+[ ] Блок живлення Ritar RTPSP 180-24 (24 В / 7,5 А) — 1 шт. x 792 грн = 792 грн
     https://www.itbox.ua/ua/product/Blok_jhivlennya_dlya_sistem_videosposterejhennya_Ritar_RTPSP_180-24-p988180/
-[ ] Перехідник DC 5.5x2.5 (гніздо) -> 5.5x2.1 (штекер) — 1 шт.
+[ ] Перехідник DC 5.5x2.5 (гніздо) -> 5.5x2.1 (штекер) — 1 шт. x 52 грн = 52 грн
     https://maxservice.com.ua/ua/perexidnyk-5-5x2-5mm-5-5x2-1mm
 
-[ ] Патч-корд — 112 м
+[ ] Патч-корд — 112 м (ціна —)
 
 
 РОБОЧЕ МІСЦЕ ОПЕРАТОРА x2
 
-[ ] CM4 PoE Mini-Computer (20016) — 2 шт.
+[ ] CM4 PoE Mini-Computer (20016) — 2 шт. x 3 015 грн = 6 030 грн
     https://evo.net.ua/raspberry-pi-compute-module-4-poe-mini-computer-19883/
 
-[ ] Raspberry Pi CM4004032 — 2 шт.
+[ ] Raspberry Pi CM4004032 — 2 шт. (ціна —)
+
+
+РАЗОМ (відомі ціни): 11 122 грн
