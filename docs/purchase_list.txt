@@ -17,9 +17,6 @@
 [ ] CM4 PoE Mini-Computer (20016) — 2 шт. x 3 015 грн = 6 030 грн
     https://evo.net.ua/raspberry-pi-compute-module-4-poe-mini-computer-19883/
 
-[ ] Raspberry Pi CM4004032 — 2 шт. x 11 435 грн = 22 870 грн
-    https://prom.ua/ua/p3140328233-cm4004032-vychislitelnyj-modul.html
-
 [ ] Кабель HDMI Merlion 0,3 м — 2 шт. x 99 грн = 198 грн
     https://comfy.ua/ua/kabel-hdmi-merlion-hdmi-hdmi-high-speed-0-3m-v1-4-black-yt-hdmi-m-m-hs-0-3m.html
 
@@ -28,9 +25,6 @@
 
 [ ] Waveshare CM4-DUAL-ETH-BOX-A-EU — 2 шт. x 6 335 грн = 12 670 грн
     https://bigl.ua/ua/p3177425939-komplekt-cm4-dual
-
-[ ] Raspberry Pi CM4002016 — 2 шт. x 7 805 грн = 15 610 грн
-    https://prom.ua/ua/p3140328230-cm4002016-vychislitelnyj-modul.html
 
 
 СЕРВЕР x1
@@ -59,6 +53,9 @@
 
 СПІЛЬНЕ
 
+[ ] Raspberry Pi CM4002016 — 4 шт. x 7 805 грн = 31 220 грн
+    https://prom.ua/ua/p3140328230-cm4002016-vychislitelnyj-modul.html
+
 [ ] Радіатор Waveshare CM4-HEATSINK (19623) — 4 шт. x 435 грн = 1 740 грн
     https://prom.ua/ua/m-396777260875339776-radiator-cm4-heatsink.html
 
@@ -71,4 +68,4 @@
 [ ] Патч-корд — 118 м (ціна —)
 
 
-РАЗОМ (відомі ціни): 101 560 грн
+РАЗОМ (відомі ціни): 94 300 грн
