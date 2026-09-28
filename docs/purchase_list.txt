@@ -29,8 +29,8 @@
 
 СЕРВЕР x1
 
-[ ] Міні-ПК Intel N100 8/128 ГБ, 4 LAN, fanless — 1 шт. x 12 999 грн = 12 999 грн
-    https://www.olx.ua/d/uk/obyavlenie/kompaktnyy-mini-pk-intel-n100-8gb-128gb-ssd-4-lan-mini-server-openwrt-fanless-ID10Eywt.html
+[ ] Неттоп Artline Business B14 (B14v21), N100 8/240 ГБ, 2 LAN — 1 шт. x 15 435 грн = 15 435 грн
+    https://ek.ua/ua/ARTLINE-BUSINESS-B14.htm
 
 
 РОБОЧЕ МІСЦЕ АДМІНІСТРАТОРА x1
@@ -68,4 +68,4 @@
 [ ] Патч-корд — 118 м (ціна —)
 
 
-РАЗОМ (відомі ціни): 94 300 грн
+РАЗОМ (відомі ціни): 96 736 грн
