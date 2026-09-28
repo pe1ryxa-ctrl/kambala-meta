@@ -59,8 +59,8 @@
 
 СПІЛЬНЕ
 
-[ ] Радіатор для CM4 (Raspberry Pi CM4 Aluminum Heatsink) — 4 шт. x 195 грн = 780 грн
-    https://www.rcscomponents.kiev.ua/product/radiator-raspberry-pi-cm4-aluminum-heatsink_199600.html
+[ ] Радіатор Waveshare CM4-HEATSINK (19623) — 4 шт. x 435 грн = 1 740 грн
+    https://prom.ua/ua/m-396777260875339776-radiator-cm4-heatsink.html
 
 [ ] Yubico Security Key NFC (USB-A), прошивка 5.4.3 — 6 шт. x 1 699 грн = 10 194 грн
     https://techwarehouse.com.ua/ua/p3119863620-apparatnyj-klyuch-bezopasnosti.html
@@ -71,4 +71,4 @@
 [ ] Патч-корд — 118 м (ціна —)
 
 
-РАЗОМ (відомі ціни): 100 600 грн
+РАЗОМ (відомі ціни): 101 560 грн
