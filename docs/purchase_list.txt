@@ -45,7 +45,22 @@
     https://rozetka.com.ua/ua/thomson-mean14c8sl256s/p495491574/
 
 
+ВУЗОЛ №2
+
+[ ] MikroTik hEX PoE lite (RB750UPr2) — 1 шт. x ~2 900 грн = ~2 900 грн
+    https://hotline.ua/ua/computer-marshrutizatory/mikrotik-hex-poe-lite-rb750upr2/
+
+[ ] Блок живлення Ritar RTPSP 180-24 (24 В / 7,5 А) — 1 шт. x 792 грн = 792 грн
+    https://www.itbox.ua/ua/product/Blok_jhivlennya_dlya_sistem_videosposterejhennya_Ritar_RTPSP_180-24-p988180/
+
+[ ] Перехідник DC 5.5x2.5 (гніздо) -> 5.5x2.1 (штекер) — 1 шт. x 52 грн = 52 грн
+    https://maxservice.com.ua/ua/perexidnyk-5-5x2-5mm-5-5x2-1mm
+
+
 СПІЛЬНЕ
+
+[ ] Радіатор для CM4 (Raspberry Pi CM4 Aluminum Heatsink) — 4 шт. x 195 грн = 780 грн
+    https://www.rcscomponents.kiev.ua/product/radiator-raspberry-pi-cm4-aluminum-heatsink_199600.html
 
 [ ] Yubico Security Key NFC (USB-A), прошивка 5.4.3 — 6 шт. x 1 699 грн = 10 194 грн
     https://techwarehouse.com.ua/ua/p3119863620-apparatnyj-klyuch-bezopasnosti.html
@@ -56,4 +71,4 @@
 [ ] Патч-корд — 118 м (ціна —)
 
 
-РАЗОМ (відомі ціни): 96 372 грн
+РАЗОМ (відомі ціни): ~100 896 грн
