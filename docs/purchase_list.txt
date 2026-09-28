@@ -47,8 +47,8 @@
 
 ВУЗОЛ №2
 
-[ ] MikroTik hEX PoE lite (RB750UPr2) — 1 шт. x ~2 900 грн = ~2 900 грн
-    https://hotline.ua/ua/computer-marshrutizatory/mikrotik-hex-poe-lite-rb750upr2/
+[ ] MikroTik hEX PoE lite (RB750UPr2) — 1 шт. x 2 604 грн = 2 604 грн
+    https://networkdiscount.com.ua/ua/p334976255-marshrutizator-mikrotik-rb750upr2.html
 
 [ ] Блок живлення Ritar RTPSP 180-24 (24 В / 7,5 А) — 1 шт. x 792 грн = 792 грн
     https://www.itbox.ua/ua/product/Blok_jhivlennya_dlya_sistem_videosposterejhennya_Ritar_RTPSP_180-24-p988180/
@@ -71,4 +71,4 @@
 [ ] Патч-корд — 118 м (ціна —)
 
 
-РАЗОМ (відомі ціни): ~100 896 грн
+РАЗОМ (відомі ціни): 100 600 грн
