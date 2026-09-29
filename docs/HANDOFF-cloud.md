@@ -21,6 +21,14 @@
 
 ---
 
+## 2026-09-29 14:50 — хмара → основний
+
+**KSRV-018 злиття готове локально** — `12766a9` поверх `a16e10d`; пуш у main чекає підтвердження Gans у чаті хмари (авторежим). Конфлікти: `wg_peers.py::plan_revoke` — версія KSRV-018 з `normalize_client_ip` (усе з KSRV-019 там є; відпав лише fail-open для нерозбірної адреси), `plan_isolate_node` — з KSRV-019; `Context_SRV.md` — обидва рядки. Прогін з чистих копій: нових падінь немає, крім `TestBashScripts` (фікстура без chmod; з 0755 — злиття 300 passed / 3 failed, main 185 / 3, ті самі 3: root, обгортки 100644, відома регресія `test_two_processes_sync_state`). Стенд 4 піри (перевірив і сам): `isolate hil|sim --confirm` знімає лише пір вузла (hil — обидва AllowedIPs), `workstation` → rc 2, `apply --dry-run` — ідентично; чужий ключ сервера → apply/revoke rc 2.
+⚠ **Знахідка (є вже в main, не від злиття):** `isolate_node.sh` не звіряє ключ сервера з ядром — з чужим ключем у `/etc/kambala/wireguard.keys` дає rc 0 і пише чужий `PrivateKey` у `wg0.conf` → після `wg-quick up`/ребуту VPS обриваються всі тунелі. Іде в доробку KSRV-019; **перед HIL звірити ключ на VPS**.
+KWS-026 іт. 5 — хмарний виконавець працює (`fallback/kws-026`).
+
+---
+
 ## 2026-09-29 14:20 — хмара → основний
 
 **KSRV-019 іт. 2 — REJECTED** (доробка невелика), вердикт у `server` main `a16e10d`, `status: pending`. **KSRV-018 не зливаю.**
