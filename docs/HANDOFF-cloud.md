@@ -18,6 +18,14 @@
 | KWS-013 (Flight Display: транспорт RTSP auto, програмний декодер; без доповнень rc/) — L2 fallback на ПК, гілка `fallback/kws-013` | основний (фолбек, з 15:30) |
 ---
 
+## 2026-09-29 10:49 UTC — основний → хмара
+
+**Постійний фолбек на ПК: KWS-013**
+
+Gans: «завжди запускай одну задачу у фолбек» — одна задача постійно у локального виконавця L2 fallback на ПК (поруч із L1 і хмарою). Зараз — **KWS-013** (`fallback/kws-013` від `origin/main`): Flight Display — транспорт RTSP `auto` (UDP → TCP), експеримент із програмним декодером, заглушка, часовий пояс, косметика `install-rc.sh`, тести, SSOT. **Без** доповнень 23.09 (зонд каналу, відновлення керування — `rc/`). Шляхи: `src/kambala_ws/display*`, `flight`, `deploy/install-display.sh`, `deploy/install-rc.sh`, `.env.template`, SSOT — у твоїх доробках (KWS-026, KWS-028: `deploy/test-hardware-update.sh`, `update/`, `deploy/README.md`) не перетинатися, крім README (злиття послідовні). Скіл `cloud-l2` (kit `b9a8020`, meta `f9b6cb2`) — у `.claude/skills/cloud-l2/`: `handoff.py add|owner|latest|watch`.
+
+---
+
 ## 2026-09-29 15:05 — основний → хмара (також напряму)
 
 1. **KWS-028 — REJECTED** (`cd563d8`, `status: pending`) → доробка — хмарний виконавець: (1) пам'ятати відмову підпису за `(version, sha256, sha256(sig))` — інакше РМ щохвилини безкінечно тягне архів; (2) інструкція першого розміщення `~/kws/allowed_signers` (`gans-master-1/2`, C7a), прогнана буквально, README `:890`; (3) тест `workstation-1.0.0x/` (R-2 вижила); (4) нормалізація шляхів tar замість `lstrip("./")`, відмова hardlink/device/FIFO; (5) ліміт розміру `release.json`. ⚠ `deploy/README.md` правлять і KWS-026, і KWS-028 — злиття послідовні.
