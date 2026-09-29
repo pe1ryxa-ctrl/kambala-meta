@@ -19,6 +19,27 @@
 | Підготовка переходу РМ на релізну схему (KWS-022/030) — скрипти, колеса, фейковий HOME; результат у meta `docs/hil/rm-release-migration/` | **хмара** (з 15:45) |
 ---
 
+## 2026-09-29 10:59 UTC — основний → хмара
+
+**Крок 1 черги HIL: підготовка переходу РМ на релізну схему**
+
+Gans: «робимо все по черзі» — крок 1 черги HIL. Хмарі: **підготувати перехід РМ на релізну схему (KWS-022/030)** — скрипти, колеса, перевірка; HIL запускає Gans на ПК з моїм супроводом. Код проєкту НЕ змінювати — лише скрипти процедури в `kambala-meta` `docs/hil/rm-release-migration/` (новий каталог) + README з командами по черзі.
+
+**Живий стан РМ (знято основною сесією 29.09):** RPi 4, Debian 13, Python 3.13.5, користувач `gans`, тунель `10.66.0.3`; `~/kws` — ЗВИЧАЙНИЙ КАТАЛОГ стара розкладка (`src/`, `deploy/`, `assets/`, `profiles/`, `pyproject.toml`, `events*.jsonl`, `display_state.json`, `display_node.txt`, `flight-display.sh`, `rc.log`, `hdmitest`), `.env` у `~/kws` (змінні `KWS_SERVER_HOST`, `KWS_SERVER_RC_UDP_HOST`, `KWS_SERVER_RC_UDP_PORT` та ін. — значень не читати); `~/kws-releases`, `.venv`, служби `kambala-update` немає; активні user-служби `kambala-display|home|rc|ui` + `kambala-session.target`; інтернету на РМ немає (лише тунель до `10.66.0.1`).
+**Сервер релізів (бойовий, KSRV-017 з 29.09):** `http://10.66.0.1/releases/<component>/latest.json`; `recommend` приймається лише для підпису `gans-master-1|2` (YubiKey `sk-ssh-ed25519`); зараз для `ws` рекомендовано старий `0.0.1-test`. Зразок робочого серверного скрипта — `kambala-meta/docs/hil/hil017_server.sh` (кладе `<v>/` з `.tgz`, `.sha256`, `.sig`, `release.json` у том `kambala_releases_data`, `chown -R 10001:999`, `recommend`) — зробити аналог для `ws`.
+**Код:** `kambala-workstation` main (KWS-022, 030, 031, 023, 034, 032 злиті; ⚠ KWS-028 — підпис на РМ — ще в доробці: реліз для першого переходу **без** перевірки підпису на РМ, це нормально для HIL KWS-022/030; позначити в README). `deploy/README.md` — «перше встановлення»; `tools/build_wheels.py` / `deploy/build-wheels.sh` (aarch64, cp313); `server/tools/release.py build ws <v> --source … --wheels-dir … --key … --signer gans-master-1` (запуск із чистої копії серверного `src`).
+
+**Потрібно:**
+1. Колеса aarch64/cp313 з чистої копії workstation main — перелік; версія релізу — така, яку менеджер оновлення вважає новішою за `0.0.1-test` (перевір порівняння версій у `update/`).
+2. Непідписане тестове збирання `ws` (перевірка) + готова PowerShell-команда підпису для Gans (`--key "$env:USERPROFILE\.ssh\id_kambala_master_1" --signer gans-master-1`, OpenSSH System32 першим у PATH).
+3. Скрипт VPS (root, LF): реліз `ws` у том → `recommend`.
+4. Скрипт першого переходу РМ (user `gans`, LF), строго за README: `mv ~/kws ~/kws.pre-release-<дата>` (не видаляти), перенос машинного стану як `copy_machine_state`, розпакування в `~/kws-releases/<v>`, `~/kws` — посилання, `.venv` з коліс (`--no-index`), юніти через `deploy/install-*.sh` релізу, `kambala-update`, `systemd-analyze --user verify`, 5 служб `active`, імпорт з `.venv` потрібної версії. Окремий скрипт відкату (повернути старий каталог і юніти).
+5. Перевірка скриптів: `bash -n`, прогін у фейковому HOME на Linux з підставними `systemctl`/`loginctl`/`systemd-analyze` — поведінка на збій кожного кроку (старий `~/kws` не руйнується) і повторний запуск.
+6. HIL-чекліст після переходу: KWS-022/030 (verify юнітів, імпорт з `.venv`, автооновлення на наступну версію, відмова на колесі чужої версії) + KWS-023, KWS-031, KWS-032 (у т.ч. `KWS_TIMING_TESTS=1` на РМ), KWS-034 — кроки з їхніх task-файлів.
+Звіт — записом (`handoff.py add --side cloud`), файли — запушені в meta `docs/hil/rm-release-migration/`.
+
+---
+
 ## 2026-09-29 10:49 UTC — основний → хмара
 
 **Постійний фолбек на ПК: KWS-013**
