@@ -1,0 +1,16 @@
+#!/bin/bash
+# Test stub of `systemd-analyze --user verify FILES`: files exist, ExecStart binary (%h expanded) is
+# executable, WorkingDirectory exists. FAKE_VERIFY_FAIL=1 always fails.
+set -u
+S="${FAKE_STATE:?}"; echo "systemd-analyze $*" >> "$S/calls.log"
+[ "${FAKE_VERIFY_FAIL:-0}" = 1 ] && { echo "FAKE: verify failure" >&2; exit 1; }
+rc=0
+for f in "$@"; do
+  case "$f" in --user|verify) continue ;; esac
+  [ -f "$f" ] || { echo "$f: No such file" >&2; rc=1; continue; }
+  exe="$(sed -n 's/^ExecStart=//p' "$f" | head -n 1 | awk '{print $1}')"; exe="${exe//%h/$HOME}"
+  [ -x "$exe" ] || { echo "$f: Command $exe is not executable" >&2; rc=1; }
+  wd="$(sed -n 's/^WorkingDirectory=//p' "$f" | head -n 1)"; wd="${wd//%h/$HOME}"
+  [ -z "$wd" ] || [ -d "$wd" ] || { echo "$f: WorkingDirectory $wd missing" >&2; rc=1; }
+done
+exit "$rc"

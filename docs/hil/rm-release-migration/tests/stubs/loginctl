@@ -1,0 +1,10 @@
+#!/bin/bash
+# Test stub of loginctl. FAKE_LOGINCTL_FAIL=1 fails enable-linger.
+set -u
+S="${FAKE_STATE:?}"; echo "loginctl $*" >> "$S/calls.log"
+case "${1:-}" in
+  enable-linger) [ "${FAKE_LOGINCTL_FAIL:-0}" = 1 ] && { echo "FAKE: Could not enable linger" >&2; exit 1; }; touch "$S/linger" ;;
+  disable-linger) rm -f "$S/linger" ;;
+  show-user) if [ -e "$S/linger" ]; then echo yes; else echo no; fi ;;
+  *) echo "stub loginctl: unsupported $*" >&2; exit 1 ;;
+esac

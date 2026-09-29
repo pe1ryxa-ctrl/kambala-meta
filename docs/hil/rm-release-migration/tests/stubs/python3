@@ -1,0 +1,5 @@
+#!/bin/bash
+# Test shim: python3 of the RM is CPython 3.13. FAKE_VENV_FAIL=1 makes `python3 -m venv` fail.
+# (only for a target named .venv: the probe venv of rm_migrate.sh phase A still works)
+if [ "${FAKE_VENV_FAIL:-0}" = 1 ] && [ "${1:-}" = -m ] && [ "${2:-}" = venv ] && [[ "${!#}" == */.venv ]]; then echo "FAKE: venv failure" >&2; exit 1; fi
+exec "${FAKE_PY313:-/usr/bin/python3.13}" "$@"

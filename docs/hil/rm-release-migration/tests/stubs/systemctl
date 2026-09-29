@@ -1,0 +1,81 @@
+#!/bin/bash
+# Test stub of `systemctl --user` (fake HOME). State: $FAKE_STATE/active/<unit>, calls in $FAKE_STATE/calls.log.
+# Faults: FAKE_SYSTEMCTL_FAIL="<cmd>[:<unit>] ..." (every time), FAKE_SYSTEMCTL_FAIL_ONCE="<cmd>" (first call),
+#         FAKE_INACTIVE="<unit> ..." (start/restart of a NEW-layout unit succeeds, it never becomes active),
+#         FAKE_KILL_ON="<cmd>" (kill the process group of the caller: simulates a lost SSH / power cut).
+set -u
+S="${FAKE_STATE:?}"; mkdir -p "$S/active"
+U="$HOME/.config/systemd/user"
+echo "systemctl $*" >> "$S/calls.log"
+quiet=0; value=0; prop=""; args=()
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --user) ;;
+    --quiet|-q) quiet=1 ;;
+    --value) value=1 ;;
+    -p) prop="$2"; shift ;;
+    *) args+=("$1") ;;
+  esac
+  shift
+done
+cmd="${args[0]:-}"; units=("${args[@]:1}")
+norm() { case "$1" in *.service|*.target) echo "$1" ;; *) echo "$1.service" ;; esac; }
+faulty() {  # cmd unit
+  local f
+  for f in ${FAKE_SYSTEMCTL_FAIL:-}; do
+    [ "$f" = "$1" ] || [ "$f" = "$1:$2" ] && return 0
+  done
+  if [ -n "${FAKE_SYSTEMCTL_FAIL_ONCE:-}" ] && [ "$FAKE_SYSTEMCTL_FAIL_ONCE" = "$1" ] && [ ! -e "$S/once.$1" ]; then
+    touch "$S/once.$1"; return 0
+  fi
+  return 1
+}
+if [ -n "${FAKE_KILL_ON:-}" ] && [ "$FAKE_KILL_ON" = "$cmd" ] && [ ! -e "$S/killed" ]; then
+  touch "$S/killed"; echo "FAKE: killing process group" >&2
+  kill -9 -- "-$(ps -o pgid= $$ | tr -d ' ')"
+fi
+faulty "$cmd" "" && { echo "FAKE failure: $cmd" >&2; exit 1; }
+wants() { sed -n 's/^WantedBy=//p' "$U/$1" | tr ' ' '\n' | grep .; }
+rc=0
+case "$cmd" in
+  daemon-reload|import-environment|reset-failed) ;;
+  start|restart)
+    for u in "${units[@]}"; do u="$(norm "$u")"
+      [ -f "$U/$u" ] || { echo "Failed to start $u: Unit $u not found." >&2; rc=5; continue; }
+      faulty "$cmd" "$u" && { echo "FAKE failure: $cmd $u" >&2; rc=1; continue; }
+      # FAKE_INACTIVE hits only units of the new layout (%h/kws/.venv): the old units of a rollback start fine
+      if grep -q '%h/kws/\.venv/' "$U/$u"; then
+        case " ${FAKE_INACTIVE:-} " in *" ${u%.service} "*|*" $u "*) rm -f "$S/active/$u"; continue ;; esac
+      fi
+      touch "$S/active/$u"
+    done ;;
+  stop)
+    for u in "${units[@]}"; do rm -f "$S/active/$(norm "$u")"; done ;;
+  is-active)
+    for u in "${units[@]}"; do u="$(norm "$u")"
+      if [ -e "$S/active/$u" ]; then [ "$quiet" = 1 ] || echo active; else [ "$quiet" = 1 ] || echo inactive; rc=3; fi
+    done ;;
+  is-enabled)
+    for u in "${units[@]}"; do u="$(norm "$u")"
+      if ls "$U"/*.wants/"$u" > /dev/null 2>&1; then [ "$quiet" = 1 ] || echo enabled; else [ "$quiet" = 1 ] || echo disabled; rc=1; fi
+    done ;;
+  enable|reenable)
+    for u in "${units[@]}"; do u="$(norm "$u")"
+      [ -f "$U/$u" ] || { echo "Unit $u not found" >&2; rc=1; continue; }
+      faulty "$cmd" "$u" && { echo "FAKE failure: $cmd $u" >&2; rc=1; continue; }
+      rm -f "$U"/*.wants/"$u"
+      for t in $(wants "$u"); do mkdir -p "$U/$t.wants"; ln -sf "$U/$u" "$U/$t.wants/$u"; done
+    done ;;
+  disable)
+    for u in "${units[@]}"; do rm -f "$U"/*.wants/"$(norm "$u")"; done ;;
+  show)
+    u="$(norm "${units[0]}")"
+    case "$prop" in
+      Environment) v="$(sed -n 's/^Environment=//p' "$U/$u" 2> /dev/null | tr '\n' ' ' | sed 's/ $//')" ;;
+      MainPID) v=0 ;;
+      *) v="" ;;
+    esac
+    if [ "$value" = 1 ]; then echo "$v"; else echo "$prop=$v"; fi ;;
+  *) echo "stub systemctl: unsupported '$cmd'" >&2; rc=1 ;;
+esac
+exit "$rc"
