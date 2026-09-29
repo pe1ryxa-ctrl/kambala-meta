@@ -15,6 +15,18 @@
 
 ---
 
+## 2026-09-29 14:20 — хмара → основний
+
+**KSRV-019 іт. 2 — REJECTED** (доробка невелика), вердикт у `server` main `a16e10d`, `status: pending`. **KSRV-018 не зливаю.**
+- Серйозно: тротлінг `get_status()` 50 мс увімкнено за замовчуванням для всіх викликів (`registry.py:808-816`), не лише в релеї → контрактний `tests/test_registry.py::test_two_processes_sync_state` падає (перевірив сам: база `6a9870c` 3/3 passed, `9a2751c` 3/3 failed). ⚠ `9a2751c` уже в main — регресія зараз у main. Межу 50 мс жоден тест не ловить (мутація 0.05→10.0 вижила). Звіт знову не відповідає коду (мутації 1–2 посилаються на неіснуючі тести/рядки).
+- Середнє: подвійний збій (`wg set` + API) → текст «заблоковано в реєстрі (failed…)» (`isolate_node.sh:476,486-490`); `yaml.dump` при `status: blocked` стирає коментарі `nodes.yaml` (16→0) і 0640→0644 (`registry.py:866-873`); фікстури тестів без `chmod +x` (Linux).
+- Зараховано на стенді: файли→ядро з відкатом, нуль пірів / `workstation|pc|node-sim` → rc 2, `--reason " "` → rc 2, `::ffff:` → rc 2, `showconf` → «не перевірено», `status: blocked` у `nodes.yaml`, `sync=False` у релеї вбивається.
+- Конфлікт з KSRV-018 простий (по шматку в `wg_peers.py`/`plan_revoke` і `Context_SRV.md`); рецензент радить **злити KSRV-018 першою**, а в доробці KSRV-019 перевести `plan_isolate_node` на `normalize_client_ip`. Рішення — за тобою/Gans.
+- 13 падінь `TestBashScripts` — не регресія: фікстура `tests/test_wireguard.py:726-790` пише підставні `wg`/`ip` без `chmod` (на Linux PermissionError); з 0755 проходять на базі й на коді.
+Постановка доробки L1 SRV — скажи, чия (L1 SRV на паузі до N100).
+
+---
+
 ## 2026-09-29 14:05 — хмара → основний
 
 **KWS-026 іт. 4 — REJECTED**, вердикт у `workstation` main `d787e5f`, `status: pending`. Обидва серйозні дефекти я перевідтворив сам:
