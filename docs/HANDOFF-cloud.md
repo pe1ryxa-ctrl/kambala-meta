@@ -189,6 +189,16 @@ Gans: «завжди запускай одну задачу у фолбек» �
 
 ---
 
+## 2026-09-29 22:30 — хмара → основний
+
+- **KSRV-024** — ТЗ у server main `fdcb20d` + рядок у `cloud_queue.md` (дозвіл Gans); routine візьме на наступному запуску.
+- **KSRV-023 — VERIFIED (очікує HIL)**, вердикт на `fallback/ksrv-023` `a0b2738`; **злиття в main — зі слова Gans (вранці)**. Справжні verifier+installer РМ (`0771a35`) приймають `workstation 0.0.9` з `8463ef9`, `kambala-session-start.sh` 0755; індекс/тег/`--git-modes-from`/`chmod 666` → однаковий sha256; LF; hardlink → файл; FIFO/сокет/абсолютний і `..` симлінк → відмова з видаленням часткового архіву; `ws` → `workstation`; старі архіви (0666, записи-каталоги, CRLF `.sha256`) приймаються. Дрібне: обрізаний `.tgz` при `OSError` (є й у базі), мутація O7 (`.lower()` `tools/release.py:159`), застереження до «байт-у-байт» у `infra/README.md:563`.
+  ⚠ **Разом зі злиттям KSRV-023 — правка HIL-пакета в meta** (без неї крок 5 `build_release.sh` падає, 9 розбіжностей): `build_release.sh:93` + `--git-modes-from "$WS_REPO" --git-modes-ref "$REF"`; `pc_build_release.ps1:89` і `:111` + `--git-modes-from $WsRepo --git-modes-ref $Ref`; бажано `:97-98` попередження → `Fail` зі звіркою `git ls-tree`. До злиття KSRV-023 не міняти (старий `release.py` не знає ключів). Зроблю разом зі злиттям, якщо Gans дасть слово.
+- **KWS-035** — ТЗ на `fallback/kws-035` `c645b6e`, виконавець працює.
+- **KWS-013 іт. 3** — рецензія на справжньому GStreamer триває.
+
+---
+
 ## 2026-09-29 21:40 — хмара → основний (нічний пакет)
 
 - **KSRV-024** — ТЗ написано й закомічено разом із рядком `- [ ] KSRV-024` у `.agents/cloud_queue.md` локально (`fdcb20d` поверх server main `b7e8338`); **пуш у server main чекає підтвердження Gans у чаті хмари** — routine візьме після пушу. Обсяг: дрейф файлу пирів в `isolate_node.sh` (відмова як `revoke.sh`), правдиві підказки з готовою командою `wg set … remove` і ключем, тест «пір зник з ядра» (O6), при відмові — блокування в реєстрі + готові команди («захоплений вузол»), `who -m` IPv6 у `revoke.sh`/`apply.sh`, прибрати `KAMBALA_MOCK_*`, хвости `deploy.sh` (R3b, `Dockerfile` у контексті, свіжість `.prom` R8), дрібне README.
