@@ -1,8 +1,107 @@
-# tests/run_fake_home.sh — прогін 2026-09-29 (хмара, Linux x86_64, Python 3.13.12, OpenSSH_9.6p1 Ubuntu-3ubuntu13.19)
-# релізи: build_release.sh 0.0.2 / 0.0.3 --test-version / 0.0.4 --test-version (--wheels-from wheels-0.0.3), workstation release/0.0.2 8463ef9 (без KWS-029), server 66762e2
-# 0.0.2 sha256 1c08f9800ea75d1f58b877ef2cb1b9315b489900f635c3997d7fb67d3dd98996
-# shellcheck 0.11.0 -S warning: чисто; bash -n: чисто
-================ SUMMARY: 96 passed, 0 failed (work dir /tmp/kws-fakehome.*)
+work dir: /tmp/kws-fakehome.01gdoq
+== S1 happy path, repeat run, autoupdate (KWS-022/028/030), rollback, re-migration
+  PASS S1 migrate 0.0.2: exit 0
+  PASS S1 ~/kws -> ~/kws-releases/0.0.2/workstation-0.0.2
+  PASS S1 old dir kept as ~/kws.pre-release-*
+  PASS S1 old dir content unchanged (+allowed_signers)
+  PASS S1 machine state copied (.env events* display_* profiles allowed_signers)
+  PASS S1 no old junk in the release (rc.log, flight-display.sh, hdmitest)
+  PASS S1 .venv imports kambala-ws 0.0.2 from the release .venv
+  PASS S1 5 units: %h/kws/.venv, no PYTHONPATH, enabled
+  PASS S1 5 services active
+  PASS S1 kambala-session-start.sh executable via ~/kws
+  PASS S1 current=0.0.2
+  PASS S2 repeat run: exit 0, 'ALREADY MIGRATED'
+  PASS S2 repeat run changed nothing
+== S3 autoupdate with the real kambala_ws.update (after migration)
+  PASS S3a tampered 0.0.3: refused (verifying), 3 cycles -> 1 download, ~/kws still 0.0.2
+  PASS S3b unsigned 0.0.3: refused, 2 cycles -> 1 download, version unchanged
+  PASS S3c no allowed_signers: refused, 1 download for 2 cycles
+  PASS S3c allowed_signers back -> new attempt -> updated to 0.0.3
+  PASS S3c 0.0.3 .venv version, 0.0.2 kept for rollback, state files carried
+  PASS S3c deploy/kambala-session-start.sh executable after autoupdate (Linux-built archive)
+  PASS S3d 0.0.4 with wheel 0.0.3: refused ('Версія колеса'), ~/kws still 0.0.3, no 0.0.4 dir
+== S4 rollback after migration + autoupdate; repeat rollback; re-migration
+  PASS S4 rollback: exit 0
+  PASS S4 old ~/kws, old units, labwc, services, linger exactly as before
+  PASS S4 kambala-update not active, ~/kws-releases moved aside
+  PASS S4 repeat rollback: exit 0, 'already rolled back', nothing changed
+  PASS S4 repeat rollback left state identical
+  PASS S4 re-migration after rollback: exit 0, link 0.0.2
+  PASS S4 second rollback restores the original again
+  PASS S4 state after second rollback
+== F: failures in phases A/B (nothing live touched; rollback undoes allowed_signers)
+  PASS F1 version not on server: exit 1 + 'download from'
+  PASS F1 version not on server: live untouched (no stop, same units/dir; only ~/kws/allowed_signers added)
+  PASS F1 version not on server: diff vs original = only allowed_signers (+ prepared ~/kws-releases)
+  PASS F1 version not on server: rm_rollback.sh -> exactly the original
+  PASS F1 version not on server: state after rollback
+  PASS F2 sha256 mismatch: exit 1 + 'sha256 mismatch'
+  PASS F2 sha256 mismatch: live untouched (no stop, same units/dir; only ~/kws/allowed_signers added)
+  PASS F2 sha256 mismatch: diff vs original = only allowed_signers (+ prepared ~/kws-releases)
+  PASS F2 sha256 mismatch: rm_rollback.sh -> exactly the original
+  PASS F2 sha256 mismatch: state after rollback
+  PASS F3 signature by an untrusted key: exit 1 + 'signature NOT valid'
+  PASS F3 signature by an untrusted key: live untouched (no stop, same units/dir; only ~/kws/allowed_signers added)
+  PASS F3 signature by an untrusted key: diff vs original = only allowed_signers (+ prepared ~/kws-releases)
+  PASS F3 signature by an untrusted key: rm_rollback.sh -> exactly the original
+  PASS F3 signature by an untrusted key: state after rollback
+  PASS F4 missing public key #2: exit 1, nothing changed at all
+  PASS F4 state identical (allowed_signers not written)
+  PASS F5 hard-link entry in the archive: exit 1 + 'archive structure check failed'
+  PASS F5 hard-link entry in the archive: live untouched (no stop, same units/dir; only ~/kws/allowed_signers added)
+  PASS F5 hard-link entry in the archive: diff vs original = only allowed_signers (+ prepared ~/kws-releases)
+  PASS F5 hard-link entry in the archive: rm_rollback.sh -> exactly the original
+  PASS F5 hard-link entry in the archive: state after rollback
+  PASS F5 log names the hardlink entry
+  PASS F6 release 0.0.4 carrying the 0.0.3 wheel: exit 1 + 'archive structure check failed'
+  PASS F6 release 0.0.4 carrying the 0.0.3 wheel: live untouched (no stop, same units/dir; only ~/kws/allowed_signers added)
+  PASS F6 release 0.0.4 carrying the 0.0.3 wheel: diff vs original = only allowed_signers (+ prepared ~/kws-releases)
+  PASS F6 release 0.0.4 carrying the 0.0.3 wheel: rm_rollback.sh -> exactly the original
+  PASS F6 release 0.0.4 carrying the 0.0.3 wheel: state after rollback
+  PASS F7 python3 -m venv fails: exit 1 + 'python3 -m venv'
+  PASS F7 python3 -m venv fails: live untouched (no stop, same units/dir; only ~/kws/allowed_signers added)
+  PASS F7 python3 -m venv fails: diff vs original = only allowed_signers (+ prepared ~/kws-releases)
+  PASS F7 python3 -m venv fails: rm_rollback.sh -> exactly the original
+  PASS F7 python3 -m venv fails: state after rollback
+  PASS F8 pip install of a broken wheel fails: exit 1 + 'pip install dependency wheels'
+  PASS F8 pip install of a broken wheel fails: live untouched (no stop, same units/dir; only ~/kws/allowed_signers added)
+  PASS F8 pip install of a broken wheel fails: diff vs original = only allowed_signers (+ prepared ~/kws-releases)
+  PASS F8 pip install of a broken wheel fails: rm_rollback.sh -> exactly the original
+  PASS F8 pip install of a broken wheel fails: state after rollback
+  PASS F9 labwc autostart uses ~/kws/flight-display.sh (not in the release): exit 1 + 'missing in the release: flight-display.sh'
+  PASS F9 labwc autostart uses ~/kws/flight-display.sh (not in the release): live untouched (no stop, same units/dir; only ~/kws/allowed_signers added)
+  PASS F9 labwc autostart uses ~/kws/flight-display.sh (not in the release): diff vs original = only allowed_signers (+ prepared ~/kws-releases)
+  PASS F9 labwc autostart uses ~/kws/flight-display.sh (not in the release): rm_rollback.sh -> exactly the original
+  PASS F9 labwc autostart uses ~/kws/flight-display.sh (not in the release): state after rollback
+  PASS F10 ARMED: exit 1, nothing changed at all
+  PASS F10 state identical
+  PASS F11 no ~/kws/.env: exit 1, nothing changed
+  PASS F11 state identical
+  PASS F12 failed preparation, then a plain re-run succeeds
+  PASS F12 rollback -> original
+  PASS F13 rm_rollback.sh on an untouched machine: exit 0, nothing changed
+  PASS F13 state identical
+== C: failures in phase C (switch) -> automatic rollback to exactly the original
+  PASS C1 install-update.sh fails (enable): exit 1 + 'install-update.sh failed' + automatic rollback OK
+  PASS C1 install-update.sh fails (enable): exactly the original (dir, units, labwc, pcmanfm, 4 old active, linger)
+  PASS C2 loginctl enable-linger fails: exit 1 + 'install-display.sh failed' + automatic rollback OK
+  PASS C2 loginctl enable-linger fails: exactly the original (dir, units, labwc, pcmanfm, 4 old active, linger)
+  PASS C3 systemd-analyze --user verify fails: exit 1 + 'post-switch checks failed' + automatic rollback OK
+  PASS C3 systemd-analyze --user verify fails: exactly the original (dir, units, labwc, pcmanfm, 4 old active, linger)
+  PASS C4 kambala-ui never becomes active: exit 1 + 'not active after' + automatic rollback OK
+  PASS C4 kambala-ui never becomes active: exactly the original (dir, units, labwc, pcmanfm, 4 old active, linger)
+  PASS C5 daemon-reload fails once: exit 1 + 'install-display.sh failed' + automatic rollback OK
+  PASS C5 daemon-reload fails once: exactly the original (dir, units, labwc, pcmanfm, 4 old active, linger)
+  PASS C6 --no-auto-rollback: exit 1, left switched
+  PASS C6 manual rm_rollback.sh -> exactly the original
+  PASS C6 state
+  PASS C7 script killed mid-switch (SSH lost / power): state 'switching', old dir kept
+  PASS C7 re-run refuses to guess (exit 1, 'already a link')
+  PASS C7 rm_rollback.sh after the kill -> exactly the original
+  PASS C7 state
+
+================ SUMMARY: 96 passed, 0 failed (work dir /tmp/kws-fakehome.01gdoq, full log /tmp/kws-fakehome.01gdoq/all.log)
 PASS  S1 migrate 0.0.2: exit 0
 PASS  S1 ~/kws -> ~/kws-releases/0.0.2/workstation-0.0.2
 PASS  S1 old dir kept as ~/kws.pre-release-*
