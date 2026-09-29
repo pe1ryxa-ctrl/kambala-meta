@@ -16,12 +16,11 @@ OUT="${1:-}"
 mkdir -p "$OUT"; OUT="$(cd "$OUT" && pwd)"
 PY313="${FAKE_PY313:-/usr/bin/python3.13}"
 WS_SRC_REPO="${WS_REPO:-/home/user/kambala-workstation}"
-WS_REF="${WS_REF:-2e6432a}"
+WS_REF="${WS_REF:-8463ef9}"   # workstation release/0.0.2 (main 2e6432a without KWS-029, version 0.0.2)
 
-for v in 0.0.2 0.0.3; do
-  [ -f "$OUT/workstation-$v.tgz" ] || bash "$PROC/build_release.sh" "$v" --out "$OUT" > /dev/null || { echo "build $v failed"; exit 1; }
-done
-[ -f "$OUT/workstation-0.0.4.tgz" ] || bash "$PROC/build_release.sh" 0.0.4 --out "$OUT" --wheels-from "$OUT/wheels-0.0.3" > /dev/null || { echo "build 0.0.4 failed"; exit 1; }
+[ -f "$OUT/workstation-0.0.2.tgz" ] || bash "$PROC/build_release.sh" 0.0.2 --ref "$WS_REF" --out "$OUT" > /dev/null || { echo "build 0.0.2 failed"; exit 1; }
+[ -f "$OUT/workstation-0.0.3.tgz" ] || bash "$PROC/build_release.sh" 0.0.3 --ref "$WS_REF" --test-version --out "$OUT" > /dev/null || { echo "build 0.0.3 failed"; exit 1; }
+[ -f "$OUT/workstation-0.0.4.tgz" ] || bash "$PROC/build_release.sh" 0.0.4 --ref "$WS_REF" --test-version --out "$OUT" --wheels-from "$OUT/wheels-0.0.3" > /dev/null || { echo "build 0.0.4 failed"; exit 1; }
 
 T="$(mktemp -d /tmp/kws-fakehome.XXXXXX)"
 echo "work dir: $T"

@@ -1,11 +1,14 @@
 #!/bin/bash
 # Kambala 2026-09-29, HIL KWS-022/030: reproducible UNSIGNED build of the workstation release on Linux
 # (cloud check / Git Bash). The signed build for the server is made on Gans's PC by pc_build_release.ps1
-# with the same steps. Project code is not changed: the version bump lives only in the throw-away copy.
+# with the same steps. Project code is not changed. Code: workstation branch release/0.0.2 (= main 2e6432a
+# without KWS-029, version 0.0.2 committed). The release version must equal [project] version of REF;
+# only HIL test releases (0.0.3+) patch it, in the throw-away copy, and only with --test-version.
 #
-#   build_release.sh <version> [--ws-repo DIR] [--server-repo DIR] [--ref REF (default 2e6432a)] [--out DIR]
-#                    [--wheels-from DIR] [--python PY]
+#   build_release.sh <version> [--ws-repo DIR] [--server-repo DIR] [--ref REF (default 8463ef9)] [--out DIR]
+#                    [--wheels-from DIR] [--test-version] [--python PY]
 #
+#   --test-version     HIL test release: <version> differs from the committed one -> patch it in the copy.
 #   --wheels-from DIR  take ready wheels from DIR instead of building them (negative HIL case:
 #                      release <v> that carries a kambala_ws wheel of another version).
 #   --break-home-unit  HIL KWS-022 rollback case: deploy/kambala-home.service of the build copy starts a
@@ -18,10 +21,11 @@ umask 022
 V=""
 WS_REPO="${WS_REPO:-/home/user/kambala-workstation}"
 SRV_REPO="${SRV_REPO:-/home/user/kambala-server}"
-REF="2e6432a"   # workstation main with KWS-028 rework 1 merged (Gans 2026-09-29)
+REF="8463ef9"   # workstation release/0.0.2: main 2e6432a - KWS-029 (revert 04b165c) + version 0.0.2
 OUT="$PWD/out"
 WHEELS_FROM=""
 BREAK_HOME=0
+TEST_VERSION=0
 PY="${PYTHON:-python3.13}"
 COMPONENT="workstation"
 
@@ -34,8 +38,9 @@ while [ $# -gt 0 ]; do
     --out) OUT="$2"; shift 2 ;;
     --wheels-from) WHEELS_FROM="$2"; shift 2 ;;
     --break-home-unit) BREAK_HOME=1; shift ;;
+    --test-version) TEST_VERSION=1; shift ;;
     --python) PY="$2"; shift 2 ;;
-    -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,16p' "$0"; exit 0 ;;
     -*) die "unknown option $1" ;;
     *) [ -z "$V" ] || die "extra argument $1"; V="$1"; shift ;;
   esac
@@ -56,10 +61,14 @@ git -C "$WS_REPO" archive "$REF" | tar -x -C "$SRC" || die "git archive $WS_REPO
 git -C "$SRV_REPO" archive origin/main | tar -x -C "$SRVSRC" || die "git archive $SRV_REPO origin/main"
 echo "   workstation $(git -C "$WS_REPO" rev-parse --short "$REF"), server $(git -C "$SRV_REPO" rev-parse --short origin/main)"
 
-echo "== 2. version $V in the build copy"
+echo "== 2. version $V"
 CUR="$("$PY" -c 'import sys,tomllib; print(tomllib.load(open(sys.argv[1],"rb"))["project"]["version"])' "$SRC/pyproject.toml")" || die "pyproject.toml unreadable"
-if [ "$CUR" != "$V" ]; then
-  echo "   WARNING: pyproject.toml says $CUR; patched to $V in the throw-away copy only (see README, 'Version')"
+if [ "$CUR" = "$V" ]; then
+  echo "   pyproject.toml at $REF: version = \"$CUR\" (committed)"
+elif [ "$TEST_VERSION" != 1 ]; then
+  die "pyproject.toml at $REF says $CUR, not $V. A real release is built only from a commit with that version (--test-version is for HIL test releases 0.0.3+)"
+else
+  echo "   HIL test release: pyproject.toml says $CUR; patched to $V in the throw-away copy only (--test-version)"
   sed -i "s/^version = \"$CUR\"\$/version = \"$V\"/" "$SRC/pyproject.toml"
   grep -q "^version = \"$V\"\$" "$SRC/pyproject.toml" || die "version patch failed"
 fi
@@ -101,6 +110,16 @@ N="$(tar -tzf "$A" | grep -c "^$COMPONENT-$V/wheels/kambala_ws-")"
 KW="$(tar -tzf "$A" | grep "^$COMPONENT-$V/wheels/kambala_ws-")"
 case "$KW" in *"/kambala_ws-$V-"*) echo "   wheel: ${KW##*/}" ;; *) echo "   WARNING: wheel ${KW##*/} is NOT of version $V (expected only for the negative case)" ;; esac
 tar -tvzf "$A" | grep -E ' [^ ]+/deploy/kambala-session-start\.sh$' | grep -q '^-rwx' || die "deploy/kambala-session-start.sh is not executable in the archive"
+# *.sh: the x bit in the archive must be exactly the git mode at REF (100755 <-> -rwx). Only the scripts
+# that are started directly (session start from ~/.bash_profile, install-kiosk.sh) are 100755 in git; the
+# rest are run as "bash <script>" and are 100644 there. A Windows build loses the x bit (README finding 6).
+git -C "$WS_REPO" ls-tree -r "$REF" | awk '$4 ~ /\.sh$/ {print ($1 == "100755" ? "x" : "-"), $4}' | sort > "$WORK/sh.git"
+awk -v p="$COMPONENT-$V/" '$NF ~ /\.sh$/ {n = $NF; sub("^" p, "", n); print (substr($1, 4, 1) == "x" ? "x" : "-"), n}' "$WORK/list.txt" | sort > "$WORK/sh.tar"
+diff "$WORK/sh.git" "$WORK/sh.tar" > /dev/null || { diff "$WORK/sh.git" "$WORK/sh.tar"; die "*.sh x bits in the archive differ from git ($REF)"; }
+echo "   *.sh: $(wc -l < "$WORK/sh.tar") files, x bits = git: +x $(awk '$1 == "x" {printf "%s ", $2}' "$WORK/sh.tar")"
+if grep -Eq "/assets/bf/|/kambala_ws/home/fc\.py$" "$WORK/list.txt"; then
+  die "KWS-029 files (assets/bf/, home/fc.py) in the archive: build from release/0.0.2, not main"
+fi
 echo "== wheels sha256"
 (cd "$WHL" && sha256sum ./*.whl)
 echo "== DONE: $A"

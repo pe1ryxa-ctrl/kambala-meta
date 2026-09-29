@@ -1,5 +1,6 @@
-# tests/run_fake_home.sh — прогін 2026-09-29 (хмара, Linux x86_64, Python 3.13, OpenSSH 9.6p1)
-# релізи: build_release.sh 0.0.2 / 0.0.3 / 0.0.4 (--wheels-from wheels-0.0.3), workstation 2e6432a, server 12766a9
+# tests/run_fake_home.sh — прогін 2026-09-29 (хмара, Linux x86_64, Python 3.13.12, OpenSSH_9.6p1 Ubuntu-3ubuntu13.19)
+# релізи: build_release.sh 0.0.2 / 0.0.3 --test-version / 0.0.4 --test-version (--wheels-from wheels-0.0.3), workstation release/0.0.2 8463ef9 (без KWS-029), server 66762e2
+# 0.0.2 sha256 1c08f9800ea75d1f58b877ef2cb1b9315b489900f635c3997d7fb67d3dd98996
 # shellcheck 0.11.0 -S warning: чисто; bash -n: чисто
 ================ SUMMARY: 96 passed, 0 failed (work dir /tmp/kws-fakehome.*)
 PASS  S1 migrate 0.0.2: exit 0

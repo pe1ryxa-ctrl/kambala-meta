@@ -1,18 +1,24 @@
 # HIL-чекліст після переходу РМ на релізну схему
 
 Виконується **після** успішного `rm_migrate.sh 0.0.2` (README, крок 3). Кроки взято з task-файлів
-workstation `2e6432a` (`.agents/tasks/KWS-022.md`, `KWS-028.md`, `KWS-030.md`, `KWS-023.md`,
+workstation `release/0.0.2` `8463ef9` (`.agents/tasks/KWS-022.md`, `KWS-028.md`, `KWS-030.md`, `KWS-023.md`,
 `KWS-031.md`, `KWS-032.md`, `KWS-034.md`) і з `Plan_WS.md`. Позначення: **ПК** — PowerShell Gans,
 **VPS** — `root@10.66.0.1`, **РМ** — `gans@10.66.0.3`. Кожен крок має очікуваний результат. Якщо результат
 інший — зупинитися, зберегти вивід і журнал (`journalctl --user -u <юніт> --since "-15 min"`).
 
-Версії для тестів збираються тим самим `pc_build_release.ps1` (README, крок 1):
+**KWS-029 (конфігуратор Betaflight, `/bf/*`, піктограма FC на плитках, `GET /fc`) на цьому релізі відсутній**
+(рішення Gans 29.09: реліз для переходу — гілка `release/0.0.2` без `b132d39`) — його кроків у чеклісті немає і
+не додавати; лише перевірка відсутності (1.12). HIL KWS-029 — після доробки (варіант A) на наступному релізі.
+
+Версії для тестів збираються тим самим `pc_build_release.ps1` (README, крок 1) з тієї ж бази `8463ef9`; версія
+`0.0.2` закомічена, тож для тестових `0.0.3`–`0.0.5` потрібен ключ `-TestVersion` (версія міняється лише в
+тимчасовій копії):
 
 | Версія | Команда на ПК | Для чого |
 |---|---|---|
-| `0.0.3` | `-Version 0.0.3` | нормальне автооновлення, ARM, статуси (KWS-022/030) |
-| `0.0.4` | `-Version 0.0.4 -WheelsFrom "$env:USERPROFILE\kws-rel\wheels-0.0.3"` | реліз із колесом іншої версії (KWS-030), поява `allowed_signers` (KWS-028) |
-| `0.0.5` | `-Version 0.0.5 -BreakHomeUnit` | битий реліз: `home` не стартує → відкат за 60 с (KWS-022); його ж файли — для відмов підпису (KWS-028) |
+| `0.0.3` | `-Version 0.0.3 -TestVersion` | нормальне автооновлення, ARM, статуси (KWS-022/030) |
+| `0.0.4` | `-Version 0.0.4 -TestVersion -WheelsFrom "$env:USERPROFILE\kws-rel\wheels-0.0.3"` | реліз із колесом іншої версії (KWS-030), поява `allowed_signers` (KWS-028) |
+| `0.0.5` | `-Version 0.0.5 -TestVersion -BreakHomeUnit` | битий реліз: `home` не стартує → відкат за 60 с (KWS-022); його ж файли — для відмов підпису (KWS-028) |
 
 Кожну версію викласти на VPS **без рекомендації**:
 `bash /tmp/kws-rel/vps_publish_ws.sh <v> /tmp/kws-rel --no-recommend`. Рекомендувати — по черзі,
@@ -36,6 +42,7 @@ workstation `2e6432a` (`.agents/tasks/KWS-022.md`, `KWS-028.md`, `KWS-030.md`, `
 | 1.9 | `test -x ~/kws/deploy/kambala-session-start.sh && echo x-ok` | `x-ok` |
 | 1.10 | `sudo reboot`, після старту — екрани і `systemctl --user is-active kambala-{display,home,rc,ui,update}` | compositor піднявся сам (автологін tty1 → `~/.bash_profile` → `~/kws/deploy/kambala-session-start.sh`), Flight Display і кіоск на своїх виводах, 5 × `active` |
 | 1.11 | `ls -ld ~/kws.pre-release-*; ls ~/kws-venv` | старий каталог і старе середовище на місці (не видаляти до кінця HIL) |
+| 1.12 | `ls -d ~/kws/assets/bf ~/kws/.venv/lib/python3.13/site-packages/kambala_ws/home/fc.py; curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8082/bf/; grep -c KWS_FC_ ~/kws/.env` | реліз **без KWS-029**: `No such file or directory` ×2, `404`, `0` (якщо в `.env` є `KWS_FC_*` — не заважає, код їх не читає) |
 
 ## 2. KWS-022 — автооновлення на наступну версію, статуси, ARM (0.0.3)
 

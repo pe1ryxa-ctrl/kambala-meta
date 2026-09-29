@@ -1,20 +1,24 @@
 # Kambala 2026-09-29, HIL KWS-022/030: SIGNED build of the workstation release on Gans's PC
 # (Windows 11, PowerShell, Python 3.12+, internet, YubiKey #1). ASCII only on purpose (PowerShell 5.1).
 # Same steps as build_release.sh (cloud, unsigned) plus the signature through release.py --key.
+# Code: workstation branch release/0.0.2 (main 2e6432a without KWS-029, version 0.0.2 committed), -Ref 8463ef9.
+# The release version must equal the committed one; HIL test releases 0.0.3+ need -TestVersion.
 #
 #   powershell -ExecutionPolicy Bypass -File pc_build_release.ps1 -Version 0.0.2
-#   ... -Version 0.0.4 -WheelsFrom $env:USERPROFILE\kws-rel\wheels-0.0.3   (negative HIL case KWS-030)
-#   ... -Version 0.0.5 -BreakHomeUnit   (HIL KWS-022: home never starts after the switch -> rollback)
+#   ... -Version 0.0.3 -TestVersion
+#   ... -Version 0.0.4 -TestVersion -WheelsFrom $env:USERPROFILE\kws-rel\wheels-0.0.3   (negative HIL case KWS-030)
+#   ... -Version 0.0.5 -TestVersion -BreakHomeUnit   (HIL KWS-022: home never starts after the switch -> rollback)
 #
 # Result in -Out: workstation-<v>.tgz, .tgz.sha256, .tgz.sig, workstation-<v>-release.json (sig+signer).
 param(
   [Parameter(Mandatory = $true)][string]$Version,
   [string]$WsRepo = "C:\Antigravity\Dev\Kambala\workstation",
   [string]$ServerRepo = "C:\Antigravity\Dev\Kambala\server",
-  [string]$Ref = "2e6432a",
+  [string]$Ref = "8463ef9",
   [string]$Out = "$env:USERPROFILE\kws-rel",
   [string]$WheelsFrom = "",
   [switch]$BreakHomeUnit,
+  [switch]$TestVersion,
   [string]$Key = "$env:USERPROFILE\.ssh\id_kambala_master_1",
   [string]$Signer = "gans-master-1",
   [string]$Python = "python"
@@ -38,19 +42,25 @@ $wheels = Join-Path $Out "wheels-$Version"
 
 Write-Host "== 1. clean copies (git archive)"
 git -C $WsRepo fetch -q origin; Check "git fetch workstation"
+git -C $WsRepo rev-parse -q --verify "$Ref^{commit}" | Out-Null
+if ($LASTEXITCODE -ne 0) { Fail "commit $Ref not found in $WsRepo (branch release/0.0.2 not pushed yet? git -C $WsRepo fetch origin release/0.0.2)" }
 git -C $WsRepo archive -o "$work\ws.tar" $Ref; Check "git archive workstation $Ref"
 tar -xf "$work\ws.tar" -C "$work\ws"; Check "tar ws"
 git -C $ServerRepo fetch -q origin; Check "git fetch server"
 git -C $ServerRepo archive -o "$work\srv.tar" origin/main; Check "git archive server"
 tar -xf "$work\srv.tar" -C "$work\srv"; Check "tar srv"
 
-Write-Host "== 2. version $Version in the build copy"
+Write-Host "== 2. version $Version"
 $pp = "$work\ws\pyproject.toml"
 $text = [IO.File]::ReadAllText($pp)
 $m = [regex]::Match($text, '(?m)^version = "([^"]*)"')
 if (-not $m.Success) { Fail "no version in pyproject.toml" }
-if ($m.Groups[1].Value -ne $Version) {
-  Write-Host "   WARNING: pyproject.toml says $($m.Groups[1].Value); patched to $Version in the throw-away copy only" -ForegroundColor Yellow
+if ($m.Groups[1].Value -eq $Version) {
+  Write-Host "   pyproject.toml at ${Ref}: version = $Version (committed)"
+} elseif (-not $TestVersion) {
+  Fail "pyproject.toml at $Ref says $($m.Groups[1].Value), not $Version. A real release is built only from a commit with that version (-TestVersion is for HIL test releases 0.0.3+)"
+} else {
+  Write-Host "   HIL test release: pyproject.toml says $($m.Groups[1].Value); patched to $Version in the throw-away copy only (-TestVersion)" -ForegroundColor Yellow
   $text = [regex]::Replace($text, '(?m)^version = "[^"]*"', "version = `"$Version`"")
   [IO.File]::WriteAllText($pp, $text)
 }
@@ -84,6 +94,9 @@ $hard = $list | Where-Object { $_ -match '^h' }
 if ($hard) { $hard | Select-Object -First 5 | Write-Host; Fail "hard-link entries in the archive: KWS-028 RM refuses them. Rebuild from a fresh git archive copy" }
 $bad = $list | Where-Object { $_ -notmatch '^-' }
 if ($bad) { $bad | Select-Object -First 5 | Write-Host; Fail "non-regular entries in the archive" }
+$nox = $list | Where-Object { $_ -match '\.sh$' -and $_ -notmatch '^-rwx' }
+if ($nox) { Write-Host "   WARNING: *.sh without +x (Windows build, README finding 6; rm_migrate.sh fixes it, auto-update does not):" -ForegroundColor Yellow; $nox | Select-Object -First 5 | Write-Host }
+if ($list | Where-Object { $_ -match '/assets/bf/|/kambala_ws/home/fc\.py$' }) { Fail "KWS-029 files (assets/bf/, home/fc.py) in the archive: build from release/0.0.2, not main" }
 $names = tar -tzf $ca
 if ($names | Where-Object { $_ -notlike "workstation-$Version/*" }) { Fail "entries outside workstation-$Version/" }
 $inner = (tar -xzOf $ca "workstation-$Version/release.json") -join "" | ConvertFrom-Json

@@ -16,7 +16,7 @@
 
 | Файл | Де запускати | Що робить |
 |---|---|---|
-| `pc_build_release.ps1` | ПК, PowerShell | чиста копія `git archive` → версія в копії → колеса → `release.py build` **без ключа** → обов'язкова перевірка (hardlink, структура, колесо) → той самий `build` **з ключем** YubiKey, звірка sha256 |
+| `pc_build_release.ps1` | ПК, PowerShell | чиста копія `git archive` гілки `release/0.0.2` → перевірка закоміченої версії → колеса → `release.py build` **без ключа** → обов'язкова перевірка (hardlink, структура, колесо) → той самий `build` **з ключем** YubiKey, звірка sha256 |
 | `build_release.sh` | Linux / хмара | те саме без підпису (відтворення й перевірка; так зібрано все нижче) |
 | `vps_publish_ws.sh` | VPS, root | перевірки (sha256, підпис проти `/opt/kambala/allowed_signers.d/allowed_signers`, tar) → том `kambala_releases_data` → `chown 10001:999` → `recommend` → `latest.json` і роздача архіву |
 | `rm_migrate.sh` | РМ, `gans` | перехід (фази A–D нижче), ідемпотентний, при збої перемикання — автоматичний відкат |
@@ -30,11 +30,16 @@
 
 ## Вихідні рішення і знахідки (прочитати до запуску)
 
-1. **Код — workstation `2e6432a`** (рішення Gans 2026-09-29): там злито KWS-028 доробку 1, тож **РМ перевіряє
-   підпис** кожного релізу автооновлення (`ssh-keygen -Y verify` проти `~/kws/allowed_signers`), пам'ятає
-   відмови (одне завантаження відхиленого релізу), відхиляє hardlink-записи tar. Сам перехід `rm_migrate.sh`
-   теж перевіряє підпис (крок A4) — перший реліз ставиться лише підписаним. ⚠ `2e6432a` містить і
-   KWS-029 (`home/fc.py`, `/bf/*`, статус задачі `reported`, не перевірено) — див. «Відкриті питання».
+1. **Код — workstation гілка `release/0.0.2`, вершина `8463ef9`** (рішення Gans 2026-09-29: реліз для
+   переходу — **без KWS-029**). Гілка = main `2e6432a` + `04b165c` (revert `b132d39` KWS-029) + `8463ef9`
+   (`version = "0.0.2"` у `pyproject.toml`). Відносно `cba0862` (KWS-032) у коді — лише KWS-028 з доробкою 1:
+   **РМ перевіряє підпис** кожного релізу автооновлення (`ssh-keygen -Y verify` проти
+   `~/kws/allowed_signers`), пам'ятає відмови (одне завантаження відхиленого релізу), відхиляє hardlink-записи
+   tar. Сам перехід `rm_migrate.sh` теж перевіряє підпис (крок A4) — перший реліз ставиться лише підписаним.
+   **Конфігуратора Betaflight (KWS-029) на цьому релізі немає:** ні `assets/bf/`, ні `home/fc.py`, ні маршруту
+   `/bf/*`, ні запиту `GET /fc` у `/status`, ні змінних `KWS_FC_*`/`KWS_HOME_BF_DIR`. main не змінено — KWS-029
+   лишається там для доробки (варіант A). Task-файл `KWS-029.md` на гілці — як у main (звіт L1 + вердикт).
+   Скрипти збирання відмовляють, якщо в архіві є `assets/bf/` або `home/fc.py` (зібрано з main замість гілки).
 2. **Компонент — `workstation`, не `ws`.** РМ питає `GET /releases/<component_id>/latest.json` з
    `component_id="workstation"` (`update/config.py:124`), архів мусить мати каталог `workstation-<v>/` і
    `release.json` з `"component": "workstation"` (`verifier.py`, `installer.check_release_json`), резервний
@@ -45,10 +50,12 @@
    `_fallback_parse_semver`, який відкидає все після `-`: `0.0.1-test → (0,0,1)`. Звідси
    `0.0.1 > 0.0.1-test` — **False** (рівні), `0.0.2 > 0.0.1-test` — True, `0.0.3 > 0.0.2` — True (замір у
    `.venv` релізу). Якби `packaging` був, `Version("0.0.2")` порівнювався б із кортежем → `TypeError` →
-   False; тому версії лише `N.N.N` (скрипти інших не приймають). У `pyproject.toml` `2e6432a` досі
-   `0.0.1`; колесо й реліз мусять мати одну версію, тому скрипти збирання міняють рядок `version` **лише в
-   тимчасовій копії** (з попередженням). Правильніше — окремий коміт `version = "0.0.2"` у workstation
-   (тоді збирати з нього, `-Ref <хеш>`); див. «Відкриті питання».
+   False; тому версії лише `N.N.N` (скрипти інших не приймають). **Версія закомічена** (`8463ef9`,
+   `pyproject.toml` — єдине джерело, `kambala_ws.__version__` читає його або метадані колеса): скрипти
+   збирання `version` **не міняють**, лише перевіряють, що в `pyproject.toml` на `-Ref`/`--ref` стоїть саме
+   `<версія>`, інакше `FAIL` (напр. `2e6432a` → `0.0.1`). Тестові релізи HIL `0.0.3`–`0.0.5` (чекліст) —
+   з тієї ж бази з явним ключем `-TestVersion`/`--test-version`: лише тоді рядок `version` міняється в
+   тимчасовій копії.
 4. **Hardlink-записи.** `release.py build` пише в tar записи-hardlink, якщо у файлів джерела є жорсткі
    посилання; самоперевірка `release.py` і сервер такий архів приймають, нова РМ відхиляє. Відтворено:
    джерело з `ln dep.whl deploy/dup.whl` → `hrw-r--r-- … wheels/python_dotenv-1.2.3-py3-none-any.whl link to
@@ -56,7 +63,7 @@
    (жорстких посилань не буває), колеса — у каталозі поза джерелом; **перед підписом обов'язково**
    `tar -tvzf workstation-<v>.tgz | grep '^h'` — порожньо (так роблять `build_release.sh`,
    `pc_build_release.ps1` крок 4, `vps_publish_ws.sh` і `rm_migrate.sh` A5). Хмарне збирання 0.0.2:
-   159 записів, усі звичайні файли.
+   153 записи, усі звичайні файли.
 5. **`allowed_signers` — перший крок `rm_migrate.sh`** (за `deploy/README.md` «Довірені ключі на РМ»):
    з відкритих ключів YubiKey №1/№2 складається `~/kws/allowed_signers` (`gans-master-1 …`,
    `gans-master-2 …`, `chmod 644`), далі нею ж перевіряється підпис архіву. Файл лежить у старому `~/kws`,
@@ -70,6 +77,11 @@
    після кожного автооновлення з Windows-збірки перевірити `test -x ~/kws/deploy/kambala-session-start.sh`
    до перезавантаження (чекліст 2.7). Сам факт на реальній Windows-збірці не перевірено (хмара без Windows):
    перевірити `tar -tvzf` після кроку 1 — у рядку `deploy/kambala-session-start.sh` має бути `-rwx`.
+   У git `release/0.0.2` біт `+x` (`100755`) мають лише два `.sh`, що запускаються напряму:
+   `deploy/kambala-session-start.sh` і `deploy/install-kiosk.sh`; решта дев'ять (`install-*.sh`,
+   `build-wheels.sh`, `boot-timing.sh`, `test-hardware-update.sh`) — `100644` і викликаються як `bash <скрипт>`
+   (автооновлення їх не запускає). `build_release.sh` звіряє біт `x` кожного `.sh` в архіві з режимом у git;
+   `pc_build_release.ps1` попереджає про `.sh` без `+x`.
 7. **Системні налаштування `install-rc.sh`** (`/etc/systemd/system/user@.service.d/kambala-rtprio.conf`,
    `usbhid.jspoll=1` у `cmdline.txt`) під час переходу **не чіпаються**: інсталятору передаються
    `KWS_RC_RT_PRIORITY=0 KWS_RC_SET_JSPOLL=0` (лише в його середовище; служби читають `.env`). Вони вже
@@ -81,20 +93,23 @@
 
 Зібрано `deploy/build-wheels.sh` (обгортка `tools/build_wheels.py`, KWS-030 — крос-збирання вже
 підтримує: `pip download --platform linux_aarch64 / manylinux2014 / manylinux_2_17 / manylinux_2_28
---python-version 3.13 --abi cp313 --only-binary=:all:`), з чистої копії `2e6432a` + `version = "0.0.2"`:
+--python-version 3.13 --abi cp313 --only-binary=:all:`), з чистої копії `release/0.0.2` `8463ef9`
+(версія `0.0.2` закомічена):
 
 | Колесо | Розмір | sha256 |
 |---|---|---|
-| `kambala_ws-0.0.2-py3-none-any.whl` | 2 405,0 КБ | `df6608c8f0e5f9e84117b1faedacc63c06a3cad809ed02a722c580854ed2ff06` |
+| `kambala_ws-0.0.2-py3-none-any.whl` | 2 389,4 КБ | `51645b41f08f9856bbf6639de40292c28a6ffeac01ad0615a9adcb570b5787d1` |
 | `python_dotenv-1.2.3-py3-none-any.whl` | 22,2 КБ | `904552145e8bfed22162c09dab1c2b9b54fefa7b23ba780f4f26ca0316b0f0d9` |
 
 Єдина залежність — `python-dotenv`, чисто-Python колесо; проблем з aarch64 немає. Колесо `kambala_ws`
 відтворюване (два збирання — однаковий sha256); колесо з ПК може відрізнятися (інша ОС) — не помилка, але
 версія в імені мусить бути `0.0.2`.
 
-**Архів** (хмара, без підпису): `workstation-0.0.2.tgz`, 5 813 465 байт, 159 записів (лише звичайні файли),
-sha256 `b93791b7797b748270b047d59a354a39fcb278ffe3b038d1ba87ff245ed4e0b9`, `release.json` усередині
-`{"component": "workstation", "version": "0.0.2"}`. Колеса й архіви (> 5 МБ) у репозиторій не покладено;
+**Архів** (хмара, без підпису; workstation `8463ef9`, server origin/main `66762e2`): `workstation-0.0.2.tgz`,
+5 779 900 байт, 153 записи (лише звичайні файли, `grep '^h'` — порожньо), sha256
+`1c08f9800ea75d1f58b877ef2cb1b9315b489900f635c3997d7fb67d3dd98996`, `release.json` усередині
+`{"component": "workstation", "version": "0.0.2"}`; `+x` — `deploy/kambala-session-start.sh`,
+`deploy/install-kiosk.sh` (= git); `assets/bf/`, `home/fc.py` відсутні. Колеса й архіви (> 5 МБ) у репозиторій не покладено;
 відтворення на Linux: `bash build_release.sh 0.0.2 --out <каталог>` (потрібні клони
 `kambala-workstation`/`kambala-server`, PyPI, `python3.13`). На сервер іде **підписаний** архів із ПК —
 його sha256 буде іншим (інша ОС), це нормально.
@@ -112,6 +127,15 @@ python -m pip download pytest --only-binary=:all: --platform manylinux2014_aarch
 ---
 
 ## Крок 1. ПК (PowerShell): збирання і підпис
+
+**Звідки код.** Гілка `release/0.0.2` у `kambala-workstation` (origin, пушить Архітектор; main не змінюється).
+Скрипт робить `git fetch origin` і збирає з коміту `-Ref` (дефолт `8463ef9` — вершина гілки), тож окремо
+перемикати гілку не треба. Перевірити до запуску:
+```powershell
+git -C C:\Antigravity\Dev\Kambala\workstation fetch origin release/0.0.2
+git -C C:\Antigravity\Dev\Kambala\workstation log --oneline -3 origin/release/0.0.2   # 8463ef9 version 0.0.2, 04b165c Revert KWS-029, 2e6432a
+```
+Якщо `8463ef9` не знайдено — гілку ще не запушено (скрипт зупиниться з `FAIL: commit 8463ef9 not found`).
 
 Передумови: клони `C:\Antigravity\Dev\Kambala\workstation` і `...\server` (інакше `-WsRepo`/`-ServerRepo`),
 Python 3.12+, інтернет, YubiKey №1, `%USERPROFILE%\.ssh\id_kambala_master_1` (заглушка ключа `-sk`) і
@@ -258,8 +282,8 @@ flight-display.sh, rc.log, hdmitest, `.env`; `~/kws-venv`; старі юніти
 | F1–F13 | збої підготовки: версії немає на сервері; sha256; чужий ключ; немає `.pub` №2; hardlink у tar; колесо чужої версії; `venv`; `pip` (бите колесо); `autostart` посилається на `~/kws/flight-display.sh`; ARM; немає `.env`; повтор після збою; `rm_rollback.sh` на незайманій машині. Щоразу: жодного `stop`, `~/kws` — каталог, відрізняється лише `allowed_signers` (+ підготовлений `~/kws-releases`), `rm_rollback.sh` → рівно вихідний стан |
 | C1–C7 | збої перемикання: `install-update.sh` (enable), `enable-linger`, `systemd-analyze verify`, служба не стає `active`, `daemon-reload` → автоматичний відкат → рівно вихідний стан; `--no-auto-rollback` + ручний відкат; скрипт убито посеред перемикання (обрив SSH/живлення) → повтор відмовляє вгадувати, `rm_rollback.sh` → вихідний стан |
 
-Прогін 2026-09-29 (релізи 0.0.2/0.0.3/0.0.4 з `2e6432a`): **96 перевірок, 0 провалів** — повний перелік у
-`tests/last-run.txt`. Тривалість ≈ 5 хв.
+Прогін 2026-09-29 (релізи 0.0.2 / 0.0.3 / 0.0.4 з `release/0.0.2` `8463ef9`; 0.0.3/0.0.4 — `--test-version`):
+**96 перевірок, 0 провалів** — повний перелік у `tests/last-run.txt`. Тривалість ≈ 5 хв.
 
 Окремо перевірено `vps_publish_ws.sh` з підставними `docker` і сервером на `127.0.0.1:8003`: публікація
 й `recommend`; повтор (`already holds this archive`); інший архів під тією ж версією — відмова; підпис
@@ -267,13 +291,11 @@ flight-display.sh, rc.log, hdmitest, `.env`; `~/kws-venv`; старі юніти
 
 ## Відкриті питання
 
-1. **Версія в `pyproject.toml`** — `0.0.1` у `2e6432a`. Збірка міняє її лише в тимчасовій копії (колесо й
-   реліз `0.0.2` з коду `2e6432a`). Краще — коміт `version = "0.0.2"` у workstation main і збирання з нього
-   (`-Ref`). Для 0.0.3–0.0.5 HIL — так само.
-2. **KWS-029 у релізі.** `2e6432a` включає `b132d39` KWS-029 (статус `reported`, не перевірено): новий
-   `home/fc.py`, маршрути `/bf/*`. Імпорт модулів запуску проходить; якщо KWS-029 не має їхати на РМ до
-   вердикту — потрібен коміт «`cba0862` + KWS-028 доробка 1» без `b132d39` (рішення Архітектора); скрипти
-   збирання приймають будь-який `-Ref`/`--ref`.
+1. ~~Версія в `pyproject.toml`~~ — закрито: `version = "0.0.2"` закомічено на `release/0.0.2` (`8463ef9`).
+   У main лишається `0.0.1`; наступний реліз з main потребує такого ж коміту версії.
+2. ~~KWS-029 у релізі~~ — закрито рішенням Gans: гілка `release/0.0.2` без `b132d39`. Коли KWS-029 (варіант
+   A) буде прийнято в main, наступний реліз збирати з main (скрипти відмовлять, поки в архіві муляж
+   `assets/bf/` — тоді прибрати цю перевірку разом із доробкою).
 3. **Біти виконання у Windows-збірці** (знахідка 6) — ризик для **автооновлення** (не для переходу):
    `release.py` (KSRV) міг би ставити `0755` для `*.sh`, або блок `~/.bash_profile` (KWS-014) — викликати
    `bash "<шлях>"`. Потрібна задача KSRV або KWS.
