@@ -12,6 +12,18 @@
 | 3 | **Empia EM2860 / EM2861 / EM2863** + SAA7113 | `eb1a:2860`, `eb1a:2861`, `eb1a:2863` | `em28xx` | запасний; апаратний масштабувальник; `eb1a:2861` може потребувати `card=` |
 | 4 | Conexant CX23102 (Hauppauge USB-Live2 тощо) | `2040:c200` та ін. | `cx231xx` | дорожчий, переважно вживаний |
 
+**Брендові пристрої на цих чипах** (легше знайти вживаними; VID:PID і плати — з `em28xx-cards.c` / `cx231xx-cards.c` mainline, 2026-09-29):
+
+| Пристрій | Чип | VID:PID | Драйвер |
+|---|---|---|---|
+| Pinnacle Dazzle DVC 90/100/101/107 (також Kaiser Baas Video to DVD maker, Kworld DVD Maker 2, Plextor ConvertX PX-AV100U) | EM2820 + SAA711x | `2304:0207`, `2304:021a` | `em28xx`, плата «capture only» |
+| Terratec Grabby | EM2860 | `0ccd:0096`, `0ccd:00b2` | `em28xx` |
+| Terratec AV350 | EM2860 | `0ccd:0084` | `em28xx` |
+| Hauppauge WinTV USB 2 | EM2820 | `2040:4200`, `2040:4201` | `em28xx` |
+| Hauppauge USB-Live2 (модель 610) | CX23102 | `2040:c200` | `cx231xx` |
+
+Не підходить: KWorld UB423-D (CX23102) — у `cx231xx` немає (є лише UB430 `1b80:e424` і UB445 `1b80:e421`).
+
 Оцінка затримки «чип + USB + драйвер» для 1–3 — ≈40–50 мс з коду драйверів; **заміру ще немає** — міряти методом «годинник RPi 5 у кадрі» (KSIM-009).
 
 ## Уже виміряні
@@ -33,4 +45,4 @@
 ## Як купувати
 
 Назва в оголошенні нічого не гарантує («EasyCAP», «DC60», «UTV007» ставлять на будь-який чип). Просити фото плати або вивід `lsusb`; брати з можливістю повернення; після отримання — `lsusb` і `v4l2-ctl --list-formats-ext` до заміру.
-Наявність на 2026-09-29: підтвердженого UTV007 чи STK1160 в Україні в наявності не знайдено (prom.ua — лістинги видалено або «недоступний», uawest — «немає в наявності»); AliExpress чип у лістингах не вказує.
+Наявність на 2026-09-29: Pinnacle Dazzle DVC100 (EM2820) — OLX, Рівне, 1 350 грн, вживаний, повний комплект (https://www.olx.ua/d/uk/obyavlenie/otsifrovka-videokasset-plata-videozahvata-pinnacle-dazzle-dvc100-dlya-otsifrovki-vhs-ID11dFDZ.html); EM2860 / Grabby / USB-Live2 в Україні не знайдено (USB-Live2 — лише перепродаж з Allegro без ціни); підтвердженого UTV007 чи STK1160 в Україні в наявності не знайдено (prom.ua — лістинги видалено або «недоступний», uawest — «немає в наявності»); AliExpress чип у лістингах не вказує.
