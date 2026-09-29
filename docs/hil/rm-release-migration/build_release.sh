@@ -91,6 +91,7 @@ fi
 echo "== 4. release.py build (unsigned)"
 rm -f "$OUT/$COMPONENT-$V.tgz" "$OUT/$COMPONENT-$V.tgz.sha256" "$OUT/$COMPONENT-$V.tgz.sig" "$OUT/$COMPONENT-$V-release.json"
 PYTHONPATH="$SRVSRC/src" "$PY" "$SRVSRC/tools/release.py" build "$COMPONENT" "$V" --source "$SRC" \
+  --git-modes-from "$WS_REPO" --git-modes-ref "$REF" \
   --wheels-dir "$WHL" --output-dir "$OUT" --notes "HIL KWS-022/030: RM release layout" > "$WORK/build.log" 2>&1 \
   || { cat "$WORK/build.log"; die "release.py build"; }
 grep -E 'SHA-256|Archive +:.*bytes' "$WORK/build.log"

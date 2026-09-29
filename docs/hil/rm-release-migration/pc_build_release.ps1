@@ -86,7 +86,7 @@ if ($WheelsFrom) {
 Write-Host "== 4. release.py build WITHOUT key -> check (mandatory before signing)"
 $env:PYTHONPATH = "$work\srv\src"
 $chk = Join-Path $work "check"
-& $Python "$work\srv\tools\release.py" build workstation $Version --source "$work\ws" --wheels-dir $wheels --output-dir $chk --notes "HIL KWS-022/030: RM release layout"
+& $Python "$work\srv\tools\release.py" build workstation $Version --source "$work\ws" --git-modes-from $WsRepo --git-modes-ref $Ref --wheels-dir $wheels --output-dir $chk --notes "HIL KWS-022/030: RM release layout"
 Check "release.py build (unsigned check)"
 $ca = Join-Path $chk "workstation-$Version.tgz"
 $list = tar -tvzf $ca; Check "tar -tvzf"
@@ -95,7 +95,10 @@ if ($hard) { $hard | Select-Object -First 5 | Write-Host; Fail "hard-link entrie
 $bad = $list | Where-Object { $_ -notmatch '^-' }
 if ($bad) { $bad | Select-Object -First 5 | Write-Host; Fail "non-regular entries in the archive" }
 $nox = $list | Where-Object { $_ -match '\.sh$' -and $_ -notmatch '^-rwx' }
-if ($nox) { Write-Host "   WARNING: *.sh without +x (Windows build, README finding 6; rm_migrate.sh fixes it, auto-update does not):" -ForegroundColor Yellow; $nox | Select-Object -First 5 | Write-Host }
+$gitx = @(git -C $WsRepo ls-tree -r $Ref | Where-Object { $_ -match '^100755 ' -and $_ -match '\.sh$' } | ForEach-Object { ($_ -split "`t")[1] })
+$archx = @($list | Where-Object { $_ -match '\.sh$' -and $_ -match '^-rwx' } | ForEach-Object { ($_ -split '\s+')[-1] -replace "^workstation-$Version/", '' })
+$diffx = Compare-Object ($gitx | Sort-Object) ($archx | Sort-Object)
+if ($diffx) { $diffx | Select-Object -First 9 | Write-Host; Fail "*.sh x-bits in the archive differ from git ($Ref) — release.py must be run with --git-modes-from (KSRV-023)" }
 if ($list | Where-Object { $_ -match '/assets/bf/|/kambala_ws/home/fc\.py$' }) { Fail "KWS-029 files (assets/bf/, home/fc.py) in the archive: build from release/0.0.2, not main" }
 $names = tar -tzf $ca
 if ($names | Where-Object { $_ -notlike "workstation-$Version/*" }) { Fail "entries outside workstation-$Version/" }
@@ -108,7 +111,7 @@ if (-not $WheelsFrom -and $kw[0] -notlike "*/kambala_ws-$Version-*") { Fail "whe
 $checkSha = (Get-FileHash -Algorithm SHA256 $ca).Hash.ToLower()
 
 Write-Host "== 5. the same build WITH the key (touch the YubiKey when it blinks)"
-& $Python "$work\srv\tools\release.py" build workstation $Version --source "$work\ws" --wheels-dir $wheels --output-dir $Out --notes "HIL KWS-022/030: RM release layout" --key $Key --signer $Signer
+& $Python "$work\srv\tools\release.py" build workstation $Version --source "$work\ws" --git-modes-from $WsRepo --git-modes-ref $Ref --wheels-dir $wheels --output-dir $Out --notes "HIL KWS-022/030: RM release layout" --key $Key --signer $Signer
 Check "release.py build (signed)"
 Remove-Item Env:PYTHONPATH
 $a = Join-Path $Out "workstation-$Version.tgz"
