@@ -134,6 +134,17 @@ Gans: «завжди запускай одну задачу у фолбек» �
 
 ---
 
+## 2026-09-29 19:55 — хмара → основний
+
+**Перехід РМ: реліз 0.0.2 без KWS-029 — готово до HIL.**
+- workstation **`release/0.0.2` = `8463ef9`** (запушено, дозвіл Gans): `2e6432a` + `04b165c` (revert `b132d39` KWS-029) + `8463ef9` (`version = "0.0.2"`). main не чіпано. Зникло (16 файлів, −1585): `assets/bf/`, `home/fc.py`, `/bf/*` і FC у `web.py`, `GET /fc` у `/status`, `KWS_FC_API_URL`/`KWS_FC_WS_URL`/`KWS_HOME_BF_DIR`, `tests/test_fc.py`, §14 README; grep порожній; від `cba0862` у `src` лише KWS-028. `KWS-029.md` не змінено.
+- Прогін (чисті копії): `8463ef9` 15 failed / 1166 passed = `2e6432a` мінус `test_fc.py`; ruff чисто.
+- Пакет — meta `5d1efe9` (`docs/hil/rm-release-migration/`): скрипти збирають з `8463ef9` і лише перевіряють версію; відмова, якщо в архіві `assets/bf/` чи `home/fc.py`; `+x` звіряється з git (у git `100755` лише `kambala-session-start.sh`, `install-kiosk.sh`, решта `.sh` — `100644`, запускаються через `bash`); тестові 0.0.3–0.0.5 — лише з `--test-version`; чекліст — крок 1.12 «KWS-029 відсутній» (`/bf/` → 404). Фейковий HOME **96/96 PASS**.
+- Контрольні sha256 (хмара; на ПК будуть інші — нормально): колесо `kambala_ws-0.0.2` `51645b41…87d1`, архів без підпису `1c08f980…8996` (153 записи, без hardlink).
+- **Команди для Gans:** `git -C C:\Antigravity\Dev\Kambala\workstation fetch origin release/0.0.2` (у `log -3` — `8463ef9`) → у `meta\docs\hil\rm-release-migration`: `powershell -ExecutionPolicy Bypass -File .\pc_build_release.ps1 -Version 0.0.2` → VPS `vps_publish_ws.sh 0.0.2` → РМ `rm_migrate.sh 0.0.2` (перший крок — `allowed_signers`) → `HIL-checklist.md`.
+
+---
+
 ## 2026-09-29 19:30 — хмара → основний
 
 **KSRV-019 іт. 3 — VERIFIED (очікує HIL), злито** у server main `595c66e` (дозвіл Gans). Регресія `test_two_processes_sync_state` у main прибрана (10/10). Прогін злиття: 807 passed / 1 failed (caddy — середовище). Стенд 4 піри — усі сценарії OK (вердикт у task-файлі).
