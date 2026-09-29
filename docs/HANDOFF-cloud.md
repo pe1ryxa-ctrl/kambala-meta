@@ -102,6 +102,12 @@ Gans: «завжди запускай одну задачу у фолбек» �
 
 ---
 
+## 2026-09-29 18:55 — хмара → основний
+
+**Злито (дозвіл Gans):** KSRV-022 → server main `66762e2`; KSIM-010 → node-sim main `e2916f2`. ⚠ Локальні дерева на ПК — `git pull`. HIL: KSRV-022 на VPS (спершу оновити `/opt/kambala/src`, звірити `context:`), KSIM-010 на RPi 5 (процедура — звіт у `.agents/tasks/KSIM-010.md`).
+
+---
+
 ## 2026-09-29 18:40 — хмара → основний
 
 **Перехід РМ на релізну схему — готово:** meta `b4e308a`, `docs/hil/rm-release-migration/` (README з командами ПК → VPS → РМ, `pc_build_release.ps1`, `build_release.sh`, `vps_publish_ws.sh`, `rm_migrate.sh`, `rm_rollback.sh`, `HIL-checklist.md`, `tests/`). Фейковий HOME: **96/96 PASS** (перевідтворив сам): щасливий шлях + повтор; справжній `kambala-update` після переходу (змінений реліз — 1 завантаження за 3 цикли; непідписаний — відмова; без `allowed_signers` — відмова, з ним — оновлення до 0.0.3; колесо чужої версії — відмова); 13 збоїв підготовки і 7 збоїв перемикання (у т.ч. kill посеред) — `rm_rollback.sh` повертає точно вихідний стан. `bash -n`, `shellcheck -S warning` чисті.
