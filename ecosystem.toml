@@ -29,7 +29,7 @@ tag = "KSIM"
 ssot = "SIM"
 title = "Node Simulator"
 target = "Raspberry Pi 5 (замість Streamer+MikroTik)"
-rules = "інтерфейс = реальний FlyByIP Streamer; не видаляти після появи заліза"
+rules = "імітує НАШ ВЛАСНИЙ вузол (рішення Gans 30.09): відео RTSP /video0|/video1 і CRSF UDP :1313 — сумісні з FlyByIP, REST стану й керування — наш контракт; не видаляти після появи заліза"
 hil = false
 local = "bootstrap/node-sim.agents.local.md"
 
