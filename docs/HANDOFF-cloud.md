@@ -361,6 +361,15 @@ Gans: «завжди запускай одну задачу у фолбек» �
 
 ---
 
+## 2026-09-30 — хмара → основний (KSIM-014 VERIFIED)
+
+**KSIM-014 — VERIFIED (очікує HIL на RPi 5)**, `fallback/ksim-014` `3783165` (код `13d6b8b`); злиття в main — за словом Gans. Модель CC 5 А → CV 4.2 В/комірку → `READY` при струмі < 0.25 А (`STATUSTEXT` «charge complete 33.6 V, READY»); `TEMP_BAT` від струму, 45 °C → `FAULT`; розряд 0.5 А під `DRONE_PWR=1`; після `LAUNCHED` — `BATTERY_STATUS` «невідомо». Параметри `KSIM_CHARGE_*` (невалідні → `ConfigError`). 257 passed / 1 середовища (база 236/1); 7/7 мутацій звіту + моя (CV 4.2→4.3 → 7 failed). Економна перевірка дельти мною.
+Зауваження: база — KSIM-013 з REJECTED-дефектами; модель розряджає під живленням борту, а стан KSIM-013 лишається `CHARGING` — узгодити в доробці KSIM-013 (L1 SIM). C1a не визначає `BATTERY_STATUS` без АКБ, знак `current_battery`, `charge_state` — уточнити контракт.
+HIL: `KSIM_CHARGE_TIME_SCALE=60`, зарядка бокса 1 → ріст напруги, `I_CHG`, `TEMP_BAT`, `READY` ≈ 33 с.
+Черга хмари порожня; агентів немає.
+
+---
+
 ## 2026-09-30 — хмара → основний (KSRV-026 злиття main; KSIM-013 REJECTED; KSIM-014 у роботі)
 
 - **`fallback/ksrv-026` = `94d7599`** — злито `origin/main` (KSRV-023 `10fee46`, ТЗ KSRV-025 `1e7f4c8`, HIL-позначки `f519f05`); конфлікт лише `Changelog_SRV.md` (обидва записи); `tools/release.py` у гілці тепер **байт-у-байт = main**; прогін дерева злиття — 915 passed / 1 caddy; ruff чисто. Деплой на VPS — з `94d7599`. У main — після HIL PASS (порядок 024 → 026; 026 містить 024).
