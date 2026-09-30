@@ -23,7 +23,8 @@ docker exec -i devices python -c 'import sys,yaml; d=yaml.safe_load(sys.stdin); 
   || { say "FAIL: новий YAML не читається"; rm -f "$NEW"; exit 2; }
 timeout 3 bash -c "</dev/tcp/${EP%:*}/${EP#*:}" && say "   ендпоінт $EP відкритий" || say "   ⚠ ендпоінт $EP не відповідає (запис усе одно можливий)"
 if [ "$MODE" != "--apply" ]; then say "== DRY-RUN: нічого не змінено. Запис: bash $0 --apply"; rm -f "$NEW"; exit 0; fi
-cp -p "$F" "$F.bak-$TS" && install -m "$(stat -c %a "$F")" -o "$(stat -c %u "$F")" -g "$(stat -c %g "$F")" "$NEW" "$F" && rm -f "$NEW" \
+# НЕ install -o: власник 10001 на хості не існує як користувач (урок 29.09) — лише chown/chmod --reference
+cp -p "$F" "$F.bak-$TS" && cp "$NEW" "$F.tmp-$TS" && chown --reference="$F" "$F.tmp-$TS" && chmod --reference="$F" "$F.tmp-$TS" && mv "$F.tmp-$TS" "$F" && rm -f "$NEW" \
   || { say "FAIL: запис (резервна копія $F.bak-$TS)"; exit 1; }
 say "== записано (резервна копія $F.bak-$TS), рестарт fcbridge"
 docker compose -f /opt/kambala/compose.yml restart fcbridge >/dev/null 2>&1; sleep 8
