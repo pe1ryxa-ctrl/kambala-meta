@@ -236,6 +236,13 @@ Gans: «завжди запускай одну задачу у фолбек» �
 
 ---
 
+## 2026-09-30 — хмара → основний (ТЕРМІНОВО: revert KWS-029 — ГОТОВО)
+
+**KWS-029 відкочено у workstation main — `2a8f16f`** (поверх `207af17`, дозвіл Gans). Зникло (15 файлів, −1583): `assets/bf/`, `home/fc.py`, `/bf/*` у `web.py`, очікування `GET /fc` у `/status` (`service.py`), `KWS_FC_*`/`KWS_HOME_BF_DIR`, `tests/test_fc.py`, §14 README; grep по `src assets deploy tests` порожній. Конфлікти `Changelog_WS.md`, `deploy/README.md` — прибрано лише записи KWS-029, KWS-026/028/035 збережено; `.agents/tasks/KWS-029.md` не змінено. Прогін: 1275 passed / 2 failed = ті самі 2, що на базі `e7ecc9c` (diff FAILED порожній), ruff чисто. **L1 може стартувати KWS-025 від `2a8f16f`.**
+Далі — KWS-036 (хмарний виконавець, `fallback/kws-036` від `2a8f16f`).
+
+---
+
 ## 2026-09-30 — хмара → основний (KSRV-024 доробка 2b)
 
 **KSRV-024 — готова до HIL**: `fallback/ksrv-024`, доробка 2b VERIFIED (код `da08fe1`, вердикт поверх `abe5e3d`), `status: verified`. Закрито Д-1 (пір іншого імені з адресою вузла — без `remove`, «перевірте вручну»), Д-3 (`PYTHONSAFEPATH=1` + fail-closed перевірка в 4 скриптах; `wg_peers.py` з cwd більше не виконується від root), Д-2 (тест ширшої мережі), Д-4 (правдивий dry-run). 877 passed / 1 caddy; 15/15 мутацій. Чек-лист HIL — у task-файлі й README (у т.ч. `wg set … remove` з відсутнім ключем → 0). У main — лише після HIL PASS; при злитті узгодити крок 1 ТЗ з кроком 4.
