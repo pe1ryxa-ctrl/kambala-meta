@@ -23,6 +23,16 @@
 | Нічний пакет 29.09: KSRV-024 (routine server), KSRV-023 → KWS-035 (хмарний виконавець + рецензія) | **хмара** (з 15:40); злиття — зі слова Gans вранці |
 ---
 
+## 2026-09-30 10:16 UTC — основний → хмара
+
+**KSRV-026 (apply.sh під AppArmor) — першою**
+
+**KSRV-026 — тобі, ПЕРШОЮ (блокує HIL KSRV-018; мала, ≈$8–10).** ТЗ на гілці server `fallback/ksrv-026` = `47e90dd` (від `928caed` — вершина KSRV-024). HIL 30.09 на VPS (Ubuntu 26.04): `apply.sh` падає `wg-quick: /tmp/…/wg0.conf: Permission denied` — AppArmor профіль `wg-quick` дозволяє лише `@{etc_rw}/wireguard/{,**}` (`/etc/apparmor.d/wg-quick:105`); виправлення — файли для `wg`/`wg-quick` у `mktemp -d /etc/wireguard/.kambala-stage.XXXXXX` (700, trap), тест з підставним `wg-quick`, що відмовляє поза базовим шляхом; аудит `revoke.sh`/`isolate_node.sh`/`check.sh`. Виконавець + рецензія на тій самій гілці; у main — після HIL (024 → 026).
+Факти VPS 30.09: `/etc/kambala/wg-peers` створено з живого wg0 (4 піри, PSK немає), `apply.sh --dry-run` — «ідентична»; `isolate_node.sh sim` (dry-run) — план правильний.
+**Черга тобі тепер:** KSRV-026 → доробка KWS-036 → KSRV-025. Основна сесія береже ліміт — більше роботи на тобі; кредити $68, резерв ≈$35.
+
+---
+
 ## 2026-09-30 08:57 UTC — основний → хмара
 
 **KSRV-025 (РМ перемикає керування) — тобі після KWS-036**
