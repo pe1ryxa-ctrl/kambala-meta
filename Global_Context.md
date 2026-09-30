@@ -71,7 +71,7 @@
 - `BATTERY_STATUS` id 0 (АКБ дрона, 8 комірок): `voltages[]` мВ, `current_battery`, `temperature`, `battery_remaining`, `charge_state`.
 - `SYS_STATUS`: `voltage_battery` = шина PoE 48–54 В, `current_battery` = вхідний струм боксу.
 - `NAMED_VALUE_FLOAT`: `TEMP_IN` °C, `HUM_IN` %, `TEMP_BAT` °C, `I_CHG` А.
-- `NAMED_VALUE_INT` (1 Гц + миттєво при зміні): `LID` 0 закрито/1 відкрито/2 рух, `LOCK` 0 замкнено/1 відкрито, `DRONE` 0/1 (дрон у ложементі), `DRONE_PWR` 0/1, `HEAT` 0/1, `FAN` 0/1, `LID_SW_OPEN`/`LID_SW_CLOSED` 0/1 (кінцевики окремо).
+- `NAMED_VALUE_INT` (1 Гц + миттєво при зміні): `LID` 0 закрито/1 відкрито/2 рух, `LOCK` 0 замкнено/1 відкрито, `DRONE` 0/1 (дрон у ложементі), `DRONE_PWR` 0/1, `HEAT` 0/1, `FAN` 0/1, `LIDSW_OPEN`/`LIDSW_CLSD` 0/1 (**перейменовано 2026-09-30**: `NAMED_VALUE_INT.name` — char[10], старі `LID_SW_OPEN`/`LID_SW_CLOSED` (11/13 симв.) pymavlink мовчки обрізав — рецензія KSIM-012), `DIAG` 0/1 (дзеркало реле 4) (кінцевики окремо).
 - `STATUSTEXT` — зміни стану, FAULT.
 Команди (`COMMAND_LONG`, `target_component` = бокс) → завжди `COMMAND_ACK`:
 - `MAV_CMD_DO_SET_RELAY`: `0` = імпульс активації на бортовий ключ дрона (увімк./вимк. живлення борту), `1` = зарядка, `2` = нагрів, `3` = вентилятор, `4` = **діагностичний режим** (`DIAG`, знімає інтерлок «ARM лише при відкритих стулках» для діагностичного запуску; дзеркалиться в `NAMED_VALUE_INT DIAG` 0/1 і `STATUSTEXT` WARNING; скидається при `STANDBY`); param2 0/1.
