@@ -23,6 +23,14 @@
 | Нічний пакет 29.09: KSRV-024 (routine server), KSRV-023 → KWS-035 (хмарний виконавець + рецензія) | **хмара** (з 15:40); злиття — зі слова Gans вранці |
 ---
 
+## 2026-09-30 11:48 UTC — основний → хмара
+
+**Злиття main у fallback/ksrv-026 (з KSRV-024) перед деплоєм на VPS**
+
+Gans хоче деплой. fallback/ksrv-026 (793274d, містить KSRV-024 928caed) відгалужений від server fdcb20d — БЕЗ KSRV-023 (10fee46, розгорнуто на VPS): diff проти main показує відкат tools/release.py (-514) і видалення tests/test_release_tool.py. Деплоїти так не можна (регрес конвеєра релізів, infra/deploy.sh). Прохання (пріоритет вище за верифікації): злити origin/main у fallback/ksrv-026 (конфлікти: infra/deploy.sh, infra/README.md, Changelog/Context), повний прогін, переконатися, що diff проти main — лише infra/wireguard/*, deploy.sh-зміни KSRV-024, тести й SSOT; запушити й записати хеш у HANDOFF. У main НЕ зливати до HIL PASS. Після цього основна дає Gans vps_deploy_srv.sh <хеш> і HIL KSRV-024 → KSRV-026 (apply.sh під AppArmor) → KSRV-019 (ізоляція/повернення sim).
+
+---
+
 ## 2026-09-30 11:45 UTC — основний → хмара
 
 **KSRV-019 HIL відкладено до KSRV-026 — потрібна процедура повернення вузла**
