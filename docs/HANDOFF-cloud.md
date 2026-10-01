@@ -31,6 +31,13 @@ Gans 01.10 ~13:49 Київ: деплой server hil/srv-025 `58e3ee8` (= fallbac
 
 ---
 
+## 2026-10-01 — хмара → основний (KWS-044 підготовка готова до ранку)
+
+**KWS-044 частина А — VERIFIED**, `fallback/kws-044` (вердикт поверх `fb1af9d`). Інструменти `deploy/latency/`: `clock.html` (годинник UTC цифрами + машинний код), `framestamp.py` (ffmpeg або GStreamer з декодером Flight Display, сам читає код часу → CSV), `latstat.py` (медіана/p90/внесок ланки/зсув NTP), `measure.sh` (ділянки 1–5, NTP, таблиця), `encoder_matrix.sh` (6 варіантів кодера), `README.md` (процедура HIL, відкат, пропозиції MediaMTX, шаблон таблиці). Flight Display: `KWS_DISPLAY_RTSP_LATENCY_MS` (0..1000), `KWS_DISPLAY_SINK_QUEUE` (`off`|`leaky1`), `python -m kambala_ws.display --print-pipeline`; без них конвеєр побайтно той самий (тест). Вивід/декодер — наявні `KWS_DISPLAY_SINK`/`KWS_DISPLAY_DECODER`. 1636 passed / 2 відомі; без конфлікту з `fallback/kws-013`.
+**Ранок 02.10, порядок:** (0) README §2 — колесо з `fallback/kws-044` на РМ (старий код нові змінні ігнорує — інакше «варіанти» = база); автооновлення на час HIL вимкнути; перевірка `.venv/bin/python -c 'import kambala_ws.display as d; print(hasattr(d,"print_pipeline"))'` → True; копія `~/kws/.env.kws044-before`, базовий `--print-pipeline`. (1) `./measure.sh ntp` на кожному хості; на ПК `clock.html` на весь екран, координати `LAT_CODE` з `LAT_FRAMES=1 ./measure.sh seg 3 probe`. (2) база по ділянках 1–5 → матриця РМ (§4) → матриця кодера (§5) → `./measure.sh table --base base`. ⚠ `v4l2h264dec`/`v4l2h264enc` перевіряються лише на залізі. Після — відкат колеса за README або частина В.
+
+---
+
 ## 2026-10-01 — хмара → основний (KWS-044 — затримка відео, на 02.10)
 
 **Gans: «став задачу на заміри і мінімізацію буферів, завтра зранку займемося».** ТЗ — workstation main `db4a3b9`, `.agents/tasks/KWS-044.md`. Суть: скрипт заміру по ділянках (джерело → захоплення → кодер → MediaMTX → декодер РМ → скло) з медіаною/p90 на базі `framestamp.py`/`g2g_crop.sh`; матриці параметрів РМ (`waylandsink`/`kmssink`, `v4l2h264dec` буфери/`avdec_h264 max-threads=1`/slice, `queue leaky`, `rtspsrc latency` 0/20/50) і кодера (`x264enc zerolatency` vs `v4l2h264enc` Baseline/intra-refresh, `sliced-threads`) — налаштовувані через `.env`, дефолти без змін до HIL; MediaMTX — лише читання й пропозиція. Живі факти: РМ уже `rtspsrc latency=0 drop-on-latency=true` + `v4l2h264dec` + `waylandsink sync=false` (`display.py:555,577`); node-sim — `x264enc tune=zerolatency` (`pipeline.py:85`). Оцінка (не замір): аналог 25 кадр/с на CM4 через VPS ≈ 100–120 мс; 50 полів ≈ 80–100; HDMI 60 ≈ 70–90; без VPS −10–20.
