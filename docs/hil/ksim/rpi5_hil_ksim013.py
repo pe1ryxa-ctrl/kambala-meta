@@ -4,6 +4,7 @@
 Запуск на RPi 5 (venv node-sim):  ~/kambala/node-sim/.venv/bin/python /tmp/rpi5_hil_ksim013.py
 Змінює лише стан віртуального боксу 1 симулятора; наприкінці повертає його в STANDBY (живлення борту вимкнено).
 """
+import os
 import time
 from collections import defaultdict
 
@@ -55,11 +56,14 @@ def pump(sec, want_ack=None):
     return ack
 
 
+HOLD = float(os.environ.get("HIL_HOLD", "0"))  # додаткова пауза після кожної команди — щоб оператор побачив зміну на екрані
+
+
 def cmd(name, command, p1, p2, expect, settle=1.5, tsys=None):
     sysid = SYS if tsys is None else tsys
     c.mav.command_long_send(sysid, COMP, command, 0, p1, p2, 0, 0, 0, 0, 0)
     ack = pump(3, want_ack=command)
-    pump(settle)
+    pump(settle + HOLD)
     ok = RES.get(ack, ack) == expect
     print(f"{'PASS' if ok else 'FAIL'}  {name}: ACK={RES.get(ack, ack)} (очікую {expect}); стан={STATE.get(st['mode'], st['mode'])} DIAG={st['diag']} LOCK={st['lock']} LID={st['lid']}")
     return ok
