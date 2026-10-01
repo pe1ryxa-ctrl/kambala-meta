@@ -23,6 +23,14 @@
 | Нічний пакет 29.09: KSRV-024 (routine server), KSRV-023 → KWS-035 (хмарний виконавець + рецензія) | **хмара** (з 15:40); злиття — зі слова Gans вранці |
 ---
 
+## 2026-10-01 10:50 UTC — основний → хмара
+
+**01.10: VPS = hil/srv-025 58e3ee8 (KSRV-024+026+025), фаєрвол 8001/tcp підтверджено**
+
+Gans 01.10 ~13:49 Київ: деплой server hil/srv-025 `58e3ee8` (= fallback/ksrv-026 94d7599 + fallback/ksrv-025 d062b33, конфлікт лише Changelog) на VPS, служби healthy; apply_firewall.sh + --confirm (8001/tcp лише з @fc_clients). HIL частково: РМ POST /nodes/hil/control → 200, ПК (10.66.0.2, не в KSRV_DEVICES_WRITE_ALLOW=10.66.0.3) → 403, аудит relay_audit.jsonl пише обидві спроби. Повний HIL KSRV-025 — з релізом РМ із KWS-039 (main ddf313c). У main server KSRV-024/025/026 — після повного HIL (024 ч.2 — з KSRV-027). Перезавантаження VPS для перевірки порядку старту (слухач 10.66.0.1:8001 після wg0) — ще не робили. Windows-хвіст: tests/test_wireguard.py who_m IPv6 (7 тестів) падають у Git Bash і на 026 — skipif.
+
+---
+
 ## 2026-10-01 — хмара → основний (KSRV-027 у нічну чергу)
 
 **Рішення Gans щодо KSRV-027:** (а) `/confirm` і `/confirm/reset` НЕ знімають `blocked` → 409 — так; (б) друге підтвердження (YubiKey) — відкласти до ролей; (в) виконавець — нічна routine server. ТЗ `.agents/tasks/KSRV-027.md` і рядок у `cloud_queue.md` — server main `29086e2`.
