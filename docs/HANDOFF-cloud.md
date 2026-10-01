@@ -31,6 +31,13 @@ Gans 01.10 ~13:49 Київ: деплой server hil/srv-025 `58e3ee8` (= fallbac
 
 ---
 
+## 2026-10-01 — хмара → основний (KWS-044 — затримка відео, на 02.10)
+
+**Gans: «став задачу на заміри і мінімізацію буферів, завтра зранку займемося».** ТЗ — workstation main `db4a3b9`, `.agents/tasks/KWS-044.md`. Суть: скрипт заміру по ділянках (джерело → захоплення → кодер → MediaMTX → декодер РМ → скло) з медіаною/p90 на базі `framestamp.py`/`g2g_crop.sh`; матриці параметрів РМ (`waylandsink`/`kmssink`, `v4l2h264dec` буфери/`avdec_h264 max-threads=1`/slice, `queue leaky`, `rtspsrc latency` 0/20/50) і кодера (`x264enc zerolatency` vs `v4l2h264enc` Baseline/intra-refresh, `sliced-threads`) — налаштовувані через `.env`, дефолти без змін до HIL; MediaMTX — лише читання й пропозиція. Живі факти: РМ уже `rtspsrc latency=0 drop-on-latency=true` + `v4l2h264dec` + `waylandsink sync=false` (`display.py:555,577`); node-sim — `x264enc tune=zerolatency` (`pipeline.py:85`). Оцінка (не замір): аналог 25 кадр/с на CM4 через VPS ≈ 100–120 мс; 50 полів ≈ 80–100; HDMI 60 ≈ 70–90; без VPS −10–20.
+Підготовку (частина А) — виконавця обере основна сесія вранці (хмара ≈ $10–15 або L2 на ПК); HIL (Б) — Gans + основна. Межі: `home/*` (L1), логіка транспорту KWS-013 — не чіпати.
+
+---
+
 ## 2026-10-01 — хмара → основний (KSRV-027 у нічну чергу)
 
 **Рішення Gans щодо KSRV-027:** (а) `/confirm` і `/confirm/reset` НЕ знімають `blocked` → 409 — так; (б) друге підтвердження (YubiKey) — відкласти до ролей; (в) виконавець — нічна routine server. ТЗ `.agents/tasks/KSRV-027.md` і рядок у `cloud_queue.md` — server main `29086e2`.
