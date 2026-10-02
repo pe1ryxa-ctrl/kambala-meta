@@ -27,3 +27,20 @@ v098_kms_daewoo_native: n=40/40 median=100.8 p10=84.7 p90=116.9 min=72.2 max=141
 v098_kms_asus_720: n=40/40 median=98.8 p10=83.9 p90=122.8 min=68.2 max=139.2 fps_real=24.9
 ```
 Примітка: `asus_native` (1920×1080 I420, ~3 МБ на кадр через трубу Python → videoconvert) — артефакт методу: подача кадру на CPU RPi 4 повільна. Не характеризує екран.
+
+## 2026-10-02 12:49 — оновлення labwc 0.9.8 → 0.20.1 на РМ-1, матриця показу
+Оновлення: `apt-get install labwc` → labwc 0.20.1 (wlroots 0.20.2), + `libwlroots-0.20`; нічого не видалено. Сесію перезапущено (`getty@tty1`): розкладка KWS-038 збереглась (HDMI-A-2 на 3920,0), kambala-display / outputs / ui — active. Відкат: `sudo apt-get install labwc=0.9.8-1+rpt1`. Умови — як у попередньому записі. Без kmssink (від labwc не залежить — див. v098_kms_*).
+```
+v020_labwc_daewoo_720: n=40/40 median=105.2 p10=80.3 p90=132.4 min=68.3 max=162.7 fps_real=25.0
+v020_labwc_daewoo_native: n=40/40 median=103.2 p10=92.5 p90=130.2 min=84.2 max=151.2 fps_real=25.0
+v020_labwc_asus_720: n=40/40 median=98.3 p10=76.3 p90=129.4 min=69.7 max=133.6 fps_real=25.0
+v020_labwc_asus_native: n=40/40 median=133.6 p10=111.7 p90=154.3 min=106.6 max=164.3 fps_real=25.0
+```
+Те саме з `<core><allowTearing>fullscreenForced</allowTearing></core>` (тимчасово, rc.xml відновлено):
+```
+v020tear_labwc_daewoo_720: n=40/40 median=113.4 p10=87.1 p90=132.0 min=63.7 max=152.1 fps_real=25.0
+v020tear_labwc_daewoo_native: n=40/40 median=116.4 p10=94.4 p90=145.4 min=72.3 max=157.4 fps_real=25.0
+v020tear_labwc_asus_720: n=40/40 median=102.1 p10=84.9 p90=118.8 min=65.5 max=167.8 fps_real=25.0
+v020tear_labwc_asus_native: n=40/40 median=135.9 p10=114.5 p90=168.9 min=103.7 max=227.2 fps_real=25.0
+```
+Стан після серії: labwc 0.20.1 лишається на РМ-1, allowTearing вимкнено (rc.xml = копія).
