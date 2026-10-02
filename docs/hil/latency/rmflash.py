@@ -7,7 +7,10 @@ PER = float(sys.argv[4]) if len(sys.argv) > 4 else 0.8
 cw, rest = (sys.argv[5] if len(sys.argv) > 5 else "640x480@30").split("x"); ch, cf = rest.split("@")
 dec = sys.argv[6] if len(sys.argv) > 6 else "jpegdec"
 FMT = os.environ.get("RMFLASH_FMT", "gray8")   # gray8 320x180 або i420 720x576 (як відео вузла)
-DW, DH = (720, 576) if FMT == "i420" else (320, 180)                    # кадр спалаху; gst-launch-1.0 правило labwc шле на KWS_DISPLAY_OUTPUT (пілот); RMFLASH_GST=/tmp/kflash (symlink) — вікно на виводі з фокусом (UI, ASUS) на весь екран
+DW, DH = (720, 576) if FMT == "i420" else (320, 180)
+if os.environ.get("RMFLASH_SIZE"):                  # напр. 800x480 — рідний розмір екрана, без масштабування
+    DW, DH = (int(v) for v in os.environ["RMFLASH_SIZE"].split("x"))
+KEEP_HZ = float(os.environ.get("RMFLASH_KEEP_HZ", "30"))  # для великих кадрів менше — щоб труба встигала                    # кадр спалаху; gst-launch-1.0 правило labwc шле на KWS_DISPLAY_OUTPUT (пілот); RMFLASH_GST=/tmp/kflash (symlink) — вікно на виводі з фокусом (UI, ASUS) на весь екран
 CH = b"\x80" * (DW * DH // 2) if FMT == "i420" else b""   # площини U/V для I420
 WHITE, BLACK = b"\xeb" * (DW * DH) + CH, b"\x10" * (DW * DH) + CH
 DISP_BIN = os.environ.get("RMFLASH_GST", "gst-launch-1.0")  # інше ім'я -> правило labwc для gst-launch-1.0 не діє
@@ -37,7 +40,7 @@ def reader():
 def keeper():                        # тримати потік кадрів живим (30 Гц), щоб waylandsink не простоював
     while not stop:
         with lock: disp.stdin.write(cur[0]); disp.stdin.flush()
-        time.sleep(1 / 30)
+        time.sleep(1 / KEEP_HZ)
 threading.Thread(target=reader, daemon=True).start(); threading.Thread(target=keeper, daemon=True).start()
 time.sleep(4)
 toggles, state = [], 0
