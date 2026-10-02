@@ -146,3 +146,13 @@ led_asus1 (ASUS через labwc, моя подача кадру Python → gst 
 led_dw1 (Daewoo): n=33/200 mean=41.2 — НЕДІЙСНО: ROI спалаху на Daewoo поставлено навмання; перемірити зі знімком
 ```
 **Дисплей ASUS (композитор + подача + панель) ≈ 45 мс** [≈ ±2,3]. Світлодіод вважаємо миттєвим (USB HID, кілька мс), тож оцінка може бути заниженою на ці кілька мс.
+
+## 2026-10-02 15:26–15:35 — g2g «половинки», матриця camserve на РМ-1 (N=60, TCP від VPS до вузла)
+```
+fast_hwjpeg_hwenc (v4l2jpegdec + v4l2h264enc): n=60 mean=154.0 [150.0..157.3] median=160
+fast_swjpeg_hwenc (jpegdec + v4l2h264enc):     n=60 mean=122.0 [119.3..124.7] median=120   ← −32 мс
+fast_hwjpeg_x264 (v4l2jpegdec + x264):         n=58 mean=157.9 [154.5..160.7] median=160
+fast_hwjpeg_hwenc_cbr (+ video_bitrate_mode=1): n=60 mean=167.3 [163.3..172.0] median=160   ← CBR гірше на ~13
+fast_swjpeg_x264: no detections (frames=1704) — перевірити окремо
+```
+**Знахідка: апаратний декодер JPEG (`v4l2jpegdec`) на RPi 4 додає ≈ 32 мс; програмний `jpegdec` швидший.** Кодер x264 і `v4l2h264enc` рівні. CBR гірше. Після серії camserve перезапущено з `jpegdec + v4l2h264enc`.
