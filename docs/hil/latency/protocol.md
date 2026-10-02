@@ -89,3 +89,10 @@ DONE
 
 ```
 Стан після серії: rc.xml = копія, labwc 0.20.1 запущено, kambala-display / kambala-outputs — active.
+
+## 2026-10-02 14:14–14:18 — від скла до скла, усе на РМ-1 (RPi 4), серія g2g1
+Схема: РМ-1 блимає на ASUS (I420 720×576, waylandsink, тимчасове правило labwc → HDMI-A-1) → аналогова камера → V399 на РМ-1 → `camserve.py`: v4l2src MJPG 640x480@30 → v4l2jpegdec → videoconvert I420 → **v4l2h264enc** (2 Мбіт/с, GOP 75, baseline, repeat_sequence_header) → RTSP :8554 → VPS MediaMTX `node/sim` (джерело тимчасово `rtsp://10.66.0.3:8554/video0`, `vps_g2g_source.sh rm1`, перезапуск mediamtx) → РМ-1 Flight Display (вузол sim) → Daewoo. Аналіз: `g2g.py` (потік node/sim з VPS на РМ, ROI ASUS 0.15,0.25,0.60,0.60 / Daewoo 0.70,0.74,0.96,0.95; затримка = різниця індексів кадрів камери × 40 мс). Аплінк РМ-1 — Ethernet.
+```
+g2g1: n=198/200 mean=340.0 median=360.0 p10=280.0 p90=400.0 sd=79.0 | arrival_diff_mean=339.9 fps_stream=25.0
+```
+Стан після: rc.xml відновлено, kambala-display active, camserve працює, node/sim → РМ-1.
