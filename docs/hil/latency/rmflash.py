@@ -61,6 +61,9 @@ for tt in toggles:
     if abs(f - b) < 20: continue
     for t, v in frames:
         if t > tt and abs(v - b) > 0.5 * abs(f - b): lat.append((t - tt) * 1000); break
+if os.environ.get("RMFLASH_RAW"):           # сирі значення для об'єднання блоків (latpool.py)
+    with open(os.environ["RMFLASH_RAW"], "a") as fh:
+        fh.write("".join("%.1f%s" % (v, os.linesep) for v in lat))
 lat.sort(); fr = [t for t, _ in frames]
 fps = len([1 for t in fr if fr[0] + 3 <= t <= fr[0] + 13]) / 10.0 if fr else 0
 if lat:
