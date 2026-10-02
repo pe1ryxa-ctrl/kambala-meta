@@ -66,7 +66,8 @@ def first_cross(seq, col, start_t, base_win, fin_win):
     b, e = statistics.median(base), statistics.median(fin)
     if abs(e - b) < 15: return None
     for f in seq:
-        if f[0] > start_t and abs(f[col] - b) > 0.5 * abs(e - b): return f
+        # лише в напрямку кінцевого рівня: АРП камери при спалаху ASUS змінює яскравість Daewoo у протилежний бік
+        if f[0] > start_t and (f[col] - b) * (e - b) > 0 and abs(f[col] - b) > 0.5 * abs(e - b): return f
     return None
 lat, arr = [], []
 for t0 in toggles:

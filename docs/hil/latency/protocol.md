@@ -96,3 +96,29 @@ DONE
 g2g1: n=198/200 mean=340.0 median=360.0 p10=280.0 p90=400.0 sd=79.0 | arrival_diff_mean=339.9 fps_stream=25.0
 ```
 Стан після: rc.xml відновлено, kambala-display active, camserve працює, node/sim → РМ-1.
+
+## 2026-10-02 14:20–14:50 — розклад «від скла до скла» на РМ-1 (camserve на РМ-1, node/sim → РМ-1)
+**Матриця g2g:** кодер і декодер JPEG у `camserve`; декодер Flight Display. N=100. Детектор до виправлення — див. примітку.
+```
+g2gm_hwjpeg_hwenc: n=100/100 mean=352.4 median=360.0 p10=320.0 p90=400.0 sd=55.9
+g2gm_swjpeg_hwenc: n=100/100 mean=280.8 median=340.0 p10=120.0 p90=400.0 sd=119.1
+g2gm_swjpeg_x264 / hwjpeg_x264: no detections (x264enc не було на РМ-1; поставлено gstreamer1.0-plugins-ugly)
+g2gd_swdisp_hwjpeg_hwenc (Flight Display avdec_h264): n=100/100 mean=366.0 median=360.0 p10=320.0 p90=440.0 sd=63.8
+g2gd_swdisp_swjpeg_x264 (avdec_h264 + jpegdec + x264): n=100/100 mean=279.2 median=300.0 p10=120.0 p90=400.0 sd=122.6
+```
+Примітка. Варіанти з великим sd і p10=120 двомодальні. Причина — АРП аналогової камери: коли спалахує ASUS, камера знижує підсилення, і яскравість Daewoo в кадрі одразу змінюється у протилежний бік. Детектор брав |зміну|. Виправлено в `g2g.py`: зараз рахується лише перетин у напрямку кінцевого рівня.
+
+**Спалах ASUS (labwc) → камера → … → аналіз на РМ-1, один годинник, `rm_seg_camserve.sh seg1`, N=60:**
+```
+seg1_camserve_local (V399→v4l2jpegdec→v4l2h264enc→RTSP 127.0.0.1→avdec): median=151.8 p10=137.7 p90=172.4
+seg1_via_vps_tcp (… → VPS MediaMTX → РМ, TCP): median=177.4 p10=148.7 p90=199.2
+seg1_via_vps_udp (… UDP, drop-on-latency): median=166.0 p10=143.6 p90=190.6
+```
+Довідково: напряму V399→jpegdec (без кодера), ASUS через labwc — ≈ 98–104 мс (v098/v020 asus_720).
+
+**g2g з виправленим детектором, N=100:**
+```
+g2gp1 (мінімальний плеєр gst-launch UDP latency=0 v4l2h264dec waylandsink замість Flight Display): mean=333.6 median=320.0 p10=280.0 p90=400.0 sd=56.3
+g2g2_fd (Flight Display, штатно): mean=324.8 median=320.0 p10=280.0 p90=360.0 sd=56.1
+```
+Flight Display проти мінімального плеєра — різниці немає. Стан після серій: rc.xml і .env відновлено, kambala-display active, camserve (v4l2jpegdec + v4l2h264enc) працює, node/sim → РМ-1.

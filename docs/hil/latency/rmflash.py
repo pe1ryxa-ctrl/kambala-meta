@@ -18,8 +18,10 @@ disp = subprocess.Popen([DISP_BIN, "-q", "fdsrc", "fd=0", f"blocksize={len(WHITE
     f"rawvideoparse", f"format={FMT}", f"width={DW}", f"height={DH}", "framerate=60/1", "!",
     "videoconvert", "!"] + (shlex.split(os.environ["RMFLASH_SINK"]) if os.environ.get("RMFLASH_SINK") else ["waylandsink"] + (["fullscreen=true"] if DISP_BIN != "gst-launch-1.0" else [])) + ["sync=false"], stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
 w, h = 320, 240
-cap = subprocess.Popen(["gst-launch-1.0", "-q", "v4l2src", f"device={dev}", "!", f"image/jpeg,width={cw},height={ch},framerate={cf}/1",
-    "!", "queue", "max-size-buffers=1", "leaky=downstream", "!"] + shlex.split(dec) + ["!", "videoconvert", "!", "videoscale", "!",
+_head = (shlex.split(os.environ["RMFLASH_CAPHEAD"]) if os.environ.get("RMFLASH_CAPHEAD") else  # напр. rtspsrc … ! avdec_h264
+         ["v4l2src", f"device={dev}", "!", f"image/jpeg,width={cw},height={ch},framerate={cf}/1",
+          "!", "queue", "max-size-buffers=1", "leaky=downstream", "!"] + shlex.split(dec))
+cap = subprocess.Popen(["gst-launch-1.0", "-q"] + _head + ["!", "videoconvert", "!", "videoscale", "!",
     f"video/x-raw,format=GRAY8,width={w},height={h}", "!", "fdsink", "fd=1", "sync=false"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=0)
 # область кадру камери (частки x0,y0,x1,y1), дефолт — центральна половина; напр. RMFLASH_ROI=0.6,0.6,0.95,0.95
 _r = [float(v) for v in os.environ.get("RMFLASH_ROI", "0.25,0.25,0.75,0.75").split(",")]
