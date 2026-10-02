@@ -23,6 +23,62 @@
 | Нічний пакет 29.09: KSRV-024 (routine server), KSRV-023 → KWS-035 (хмарний виконавець + рецензія) | **хмара** (з 15:40); злиття — зі слова Gans вранці |
 ---
 
+## 2026-10-02 12:30 — хмара → основний
+
+**KSRV-027: вердикт рецензії (Linux)**
+
+**Вердикт: VERIFIED** — KSRV-027, гілка `origin/fallback/ksrv-027` = `a413add` (код `f30b51d`, рев'ю `2ca5ddc`, звіт `a413add`), база `40fa7a7`. Рецензент — хмарний, лише читання; у kambala-server нічого не змінено.
+
+## Тести (Linux, Python 3.12, чисті копії `git archive`, `PYTHONPATH=<копія>/src`, `-p no:cacheprovider`, websockets встановлено — `test_fcbridge.py` НЕ виключався)
+- **`a413add`:** 54 failed, 989 passed, 5 skipped.
+- **`40fa7a7`:** 54 failed, 896 passed, 5 skipped.
+- **Множини падінь ідентичні** (`diff` відсортованих списків FAILED): нових — 0, зниклих — 0. Усі 54 — середовище контейнера: 53 `tests/test_releases.py` (`FileNotFoundError: 'ssh-keygen'`) + 1 `tests/test_infra.py::test_caddy_validate_accepts_configuration` (немає демона Docker).
+- **Windows-падіння на Linux проходять:** `test_isolate_node::TestIsolateNodeScript` — 72 passed (вкл. ті 38); `test_wireguard` who_m/IPv6 — passed. Підтверджує діагноз виконавця (CRLF у фікстурі / Git Bash), дефект коду немає.
+- `tests/test_restore_node.py` — усе зелене (входить у 989). `ruff check .` — All checks passed.
+
+## shellcheck / bash -n
+- `bash -n` — OK: `apply.sh`, `isolate_node.sh`, `revoke.sh`, `restore_node.sh`.
+- `shellcheck` 0.11.0 — **0 зауважень на всіх рівнях** (не лише `-S warning`) для всіх чотирьох. (Виконавець shellcheck не запускав — тепер закрито.)
+
+## Рев'ю `git diff 40fa7a7..a413add` проти ТЗ — вимоги безпеки
+- `/unblock` лише loopback (`devices/app.py:1082`, той самий `get_client_ip` по сокету, що й `/block`; порт 8002 не проксіюється Caddy — `infra/compose.yml:201`) → інакше 403 + аудит `forbidden`. ✔
+- `confirm: true` (строго bool), непорожня `reason`, `fingerprints` лише з відомих полів і непорожніх рядків; поля поза `expected_fingerprints` з `nodes.yaml` → 400 (`unchecked_fingerprint_fields`, `nodes/registry.py:53`; повторно в `unblock_node`). ✔
+- Аудит `node_unblocked` (`app.py:1176`) — до зміни стану; збій аудиту → 503 (`_audit_log` → AuditWriteError → 503), стан `blocked`. ✔
+- `/confirm`, `/confirm/reset` для `blocked` → 409 на двох рівнях (API `_refuse_if_blocked` + `NodeBlockedError` у реєстрі). Додатково закрито обхід через `mark_needs_confirmation` (`registry.py:1049`). ✔
+- `isolate_node.sh` пише ключі у `wg-peers.revoked` до змін WireGuard (`isolate_node.sh:620`; також ключ із ядра на шляху відмови, `:654`); `revoke.sh:423`. Збій запису не зупиняє ізоляцію, але дає rc 1 + готову команду — прийнятне рішення. ✔
+- `apply.sh:261`: відкликаний ключ → rc 2 до будь-яких змін, без прапорця обходу; нерозбірний список → fail-closed. ✔
+- `restore_node.sh`: перевірки до змін → rc 2 (blocked у реєстрі, ключ не відкликаний/не в ядрі/не у файлі, AllowedIPs, ключ сервера, дрейф, SSH не через вузол, відбитки); після `changes_started` (`:578`) будь-який збій → `rollback()` (`:506`: `wg-peers`, `wg0.conf`, `wg set … remove` + перевірка) → вузол `blocked`, rc 1; `--dry-run` — лише тимчасова копія + `apply.sh --dry-run`. ✔
+
+## Зауваження (жодне не блокує)
+1. **Дрібне, тест:** `app.py:1082` — немає тесту, що `client_ip == "unknown"` (немає `request.client`) дає 403 для `/unblock`; моя мутація Mf (дозволити `"unknown"`/`"testclient"`) вижила. Код правильний (білий список), це лише прогалина покриття. Те саме стосується `/block`, `/confirm` (передіснуюче).
+2. **Дрібне, аудит:** `app.py:1176–1190` — якщо `unblock_node` впаде з `OSError` (збій `save_state`), відповідь 500, стан у пам'яті відкочено (✔), але в аудиті лишається `node_unblocked` без компенсаційного запису. Так само при гонці (`NodeNotBlockedError` після аудиту) — `node_unblocked` + `rejected`. Для форензики бажано писати `unblock_failed`.
+3. **Задекларовано виконавцем, погоджуюсь:** `restore_node.sh:624` — тайм-аут `/unblock` 10 с: реєстр може стати `ok` після відкату тунелю (`:638` лише перевіряє стан одразу). Безпечно (тунелю немає), але реєстр/аудит розходяться; немає блокування від одночасних `restore`/`apply`/`isolate`/`revoke`; відкат не повертає `ip route replace`. Окремою задачею.
+4. **Не дефект:** `wg-peers.revoked` порівнює ключі як рядки; неканонічний base64 того самого ключа `wg` відхиляє сам (перевірка нульових молодших бітів у `key_from_base64`), тож обходу немає — погоджуюсь із виконавцем.
+
+## Мутації рецензента (власні, на копії `a413add`; `pytest -x tests/test_restore_node.py tests/test_registry.py`)
+- Ma `parse_revoked_file`: нерозбірний рядок пропускається (fail-open) → **вбито** `TestRevokedList::test_corrupt_list_fails_closed[not json\n]`.
+- Mb `/confirm/reset` без API-перевірки blocked → **вбито** `TestUnblockApi::test_confirm_on_blocked_node_is_409[/nodes/sim/confirm/reset-body2]`.
+- Mb2 `reset_confirmation` знімає blocked (реєстр + API) → **вбито** `TestRegistryUnblock::test_confirm_and_reset_refuse_blocked_node`.
+- Mc `mark_needs_confirmation` знижує blocked → **вбито** `test_fingerprint_mismatch_does_not_downgrade_blocked`.
+- Md відкат `restore_node.sh` не прибирає новий пір з ядра → **вбито** `TestStandIsolateRestore::test_failure_after_kernel_change_removes_new_peer`.
+- Me без відкату пам'яті при збої `save_state` в `unblock_node` → **вбито** `test_unblock_state_write_failure_keeps_block_in_memory`.
+- Mf `/unblock` пускає `client_ip` `"unknown"`/`"testclient"` → **вижила** (див. зауваження 1).
+Разом 6/7 вбито; 16/16 мутацій виконавця не повторював.
+
+## Змінені наявні тести (2, як задекларовано)
+- `tests/test_registry.py::test_two_processes_sync_state` — `confirm_node` → `unblock_node` + `expected_fingerprints` у фікстурі. Суть (міжпроцесна синхронізація стану) збережена; зміна неминуча через рішення Gans (а). ✔
+- `tests/test_isolate_node.py::TestNodesYamlStatusEdit::test_existing_status_value_replaced_in_place` — те саме; перевірка точкової правки `status` у yaml не послаблена (рядок `expected_fingerprints` додано в обидва порівнювані тексти через `text.replace`). ✔
+- Ще 2 тести лише доповнено `restore_node.sh` у списку скриптів (посилення). Інших змін наявних тестів немає.
+
+## Нотатки для HIL
+- **Передумова:** у `/etc/kambala/nodes.yaml` для `sim` мають бути `expected_fingerprints` (хоч одне поле), інакше `restore_node.sh` → rc 2, `/unblock` → 400. Перевірити на кроці 0 до ізоляції.
+- Файл відбитків (`/root/sim-fp.json`) — лише з полів, що є в `expected_fingerprints`, знятий ПОКИ тунель живий.
+- На VPS `apply.sh` тепер читає `wg-peers.revoked`; при першому деплої файлу нема — це нормально (порожній список). Після ізоляції не повертати старий блок вручну — `apply.sh` відмовить (rc 2), це очікувано.
+- Тайм-аут `/unblock` 10 с: якщо `restore_node.sh` повідомить про відкат, перевірити `GET /nodes/sim/security` ще раз через хвилину (зауваження 3).
+- Консоль хостингу напоготові; SSH — з ПК `10.66.0.2`, не через `sim`.
+
+---
+
 ## 2026-10-02 09:15 UTC — основний → хмара
 
 **KSRV-027: рецензія + прогін на Linux**
