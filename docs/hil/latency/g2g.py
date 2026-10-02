@@ -17,7 +17,12 @@ RA, RD = roi("ROI_ASUS", "0.15,0.25,0.60,0.60"), roi("ROI_DW", "0.70,0.74,0.96,0
 # спалах на ASUS: gst-launch-1.0 (правило labwc тимчасово шле його на HDMI-A-1 — див. rm_g2g.sh)
 DW, DH = 720, 576
 CH = b"\x80" * (DW * DH // 2)
-WHITE, BLACK = b"\xeb" * (DW * DH) + CH, b"\x10" * (DW * DH) + CH
+if os.environ.get("G2G_PATTERN") == "halves":   # стала середня яскравість: АРП камери не реагує
+    _l = (b"\xeb" * (DW // 2) + b"\x10" * (DW // 2)) * DH
+    _r = (b"\x10" * (DW // 2) + b"\xeb" * (DW // 2)) * DH
+    WHITE, BLACK = _l + CH, _r + CH          # «білий» = ліва половина біла
+else:
+    WHITE, BLACK = b"\xeb" * (DW * DH) + CH, b"\x10" * (DW * DH) + CH
 disp = subprocess.Popen(["gst-launch-1.0", "-q", "fdsrc", "fd=0", f"blocksize={len(WHITE)}", "!", "rawvideoparse", "format=i420",
     f"width={DW}", f"height={DH}", "framerate=60/1", "!", "videoconvert", "!", "waylandsink", "sync=false"],
     stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
@@ -34,6 +39,7 @@ def mean(b, bx):
         row = b[y * w + x0:y * w + x1:2]; s += sum(row) / len(row); n += 1
     return s / n
 frames, stop, cur = [], False, [BLACK]   # (t_arrival, idx, A, D)
+last = [None]
 lock = threading.Lock()
 def reader():
     i = 0
@@ -43,6 +49,7 @@ def reader():
             c = cap.stdout.read(w * h - len(b))
             if not c: return
             b += c
+        last[0] = bytes(b)
         frames.append((time.time(), i, mean(b, BA), mean(b, BD))); i += 1
 def keeper():
     while not stop:
@@ -79,6 +86,13 @@ for t0 in toggles:
     lat.append((fd[1] - fa[1]) * FRAME_MS); arr.append((fd[0] - fa[0]) * 1000)
 fr = [f[0] for f in frames]
 fps = len([1 for t in fr if fr[0] + 3 <= t <= fr[0] + 13]) / 10.0 if fr else 0
+if os.environ.get("G2G_SNAP") and last[0]:    # останній кадр потоку (GRAY8 320x240) у PGM — ставити ROI
+    with open(os.environ["G2G_SNAP"], "wb") as fh:
+        fh.write(b"P5 %d %d 255\n" % (w, h) + last[0])
+if os.environ.get("G2G_DUMP"):              # покадрово: t_arrival, idx, A, D + моменти спалахів — для розбору методу
+    with open(os.environ["G2G_DUMP"], "w") as fh:
+        fh.write("toggles," + ",".join("%.4f" % t for t in toggles) + os.linesep)
+        fh.write("".join("%.4f,%d,%.1f,%.1f%s" % (f[0], f[1], f[2], f[3], os.linesep) for f in frames))
 if os.environ.get("G2G_RAW"):
     with open(os.environ["G2G_RAW"], "a") as fh:
         fh.write("".join("%.1f%s" % (v, os.linesep) for v in lat))
