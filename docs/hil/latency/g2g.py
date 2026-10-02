@@ -11,6 +11,7 @@ PER = float(sys.argv[3]) if len(sys.argv) > 3 else 1.0
 URL = os.environ.get("G2G_URL", "rtsp://10.66.0.1:8554/node/sim")
 DEC = os.environ.get("G2G_DEC", "avdec_h264")
 FRAME_MS = float(os.environ.get("G2G_FRAME_MS", "40"))
+LED = os.environ.get("G2G_LED")   # шлях до /sys/class/leds/<…>/brightness — режим «екран проти світлодіода»
 def roi(env, default):
     return [float(v) for v in os.environ.get(env, default).split(",")]
 RA, RD = roi("ROI_ASUS", "0.15,0.25,0.60,0.60"), roi("ROI_DW", "0.70,0.74,0.96,0.95")
@@ -26,7 +27,7 @@ else:
 disp = subprocess.Popen(["gst-launch-1.0", "-q", "fdsrc", "fd=0", f"blocksize={len(WHITE)}", "!", "rawvideoparse", "format=i420",
     f"width={DW}", f"height={DH}", "framerate=60/1", "!", "videoconvert", "!", "waylandsink", "sync=false"],
     stdin=subprocess.PIPE, stderr=subprocess.DEVNULL)
-w, h = 320, 240
+w, h = int(os.environ.get("G2G_W", "320")), int(os.environ.get("G2G_H", "240"))   # 640x480 — для дрібного світлодіода
 cap = subprocess.Popen(["gst-launch-1.0", "-q", "rtspsrc", f"location={URL}", "protocols=tcp", "latency=0", "!", "rtph264depay", "!",
     "h264parse", "!"] + shlex.split(DEC) + ["!", "videoconvert", "!", "videoscale", "!", f"video/x-raw,format=GRAY8,width={w},height={h}",
     "!", "fdsink", "fd=1", "sync=false"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, bufsize=0)
@@ -62,7 +63,10 @@ for k in range(N):
     state ^= 1
     with lock:
         cur[0] = WHITE if state else BLACK
-        t0 = time.time(); disp.stdin.write(cur[0]); disp.stdin.flush()
+        t0 = time.time()
+        if LED:                                   # еталон із ~нульовою затримкою: світлодіод клавіатури (USB)
+            with open(LED, "w") as fh: fh.write("1" if state else "0")
+        disp.stdin.write(cur[0]); disp.stdin.flush()
     toggles.append(t0)
     time.sleep(PER + random.uniform(0, 0.08))
 time.sleep(1.0); stop = True; time.sleep(0.3); cap.kill(); disp.kill()
@@ -80,6 +84,11 @@ lat, arr = [], []
 for t0 in toggles:
     fa = first_cross(frames, 2, t0, (t0 - 0.10, t0 + 0.05), (t0 + PER - 0.25, t0 + PER - 0.02))
     if not fa: continue
+    if LED:   # затримка екрана відносно світлодіода (ROI_DW = світлодіод); обидва йдуть тим самим шляхом камери
+        fl = first_cross(frames, 3, t0, (t0 - 0.10, t0 + 0.05), (t0 + PER - 0.25, t0 + PER - 0.02))
+        if not fl: continue
+        lat.append((fa[1] - fl[1]) * FRAME_MS); arr.append((fa[0] - fl[0]) * 1000)
+        continue
     # Daewoo: базовий рівень — кадри навколо спалаху ASUS (Daewoo ще показує старе), кінцевий — перед наступним спалахом
     fd = first_cross(frames, 3, fa[0] - 0.001, (fa[0] - 0.12, fa[0] + 0.02), (t0 + PER - 0.20, t0 + PER - 0.02))
     if not fd or fd[1] <= fa[1]: continue
