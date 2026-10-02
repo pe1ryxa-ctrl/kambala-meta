@@ -187,3 +187,6 @@ ledcap jpegdec: n=100/100 mean=73.0 median=73.2 p10=52.5 p90=95.9 min=37.4
 
 Від скла до скла без композитора (`g2g_kms.py`, два kmssink на спільному fd DRM, labwc зупинено): `kms1: no detections` — схоже, вивід не з'явився; налагодити в понеділок. Ціна композитора лишається з блокового заміру: −12,7 мс.
 Слайд підсумку: https://claude.ai/artifact/9vxNui8hcN4pJ8va2kuyhz
+
+## 2026-10-02 — стенд повернуто
+VPS: node/sim → `rtsp://10.66.0.10:8554/video0`, `sourceOnDemand: yes`, `rtspTransport: tcp` (Gans: `vps_mtx_variant.sh baseline`, `vps_g2g_source.sh restore`). РМ-1 лишається з labwc 0.20.1, пакетами `python3-gst-1.0`, `gir1.2-gst-rtsp-server-1.0`, `gstreamer1.0-plugins-ugly`; V399 і клавіатура K300 — на РМ-1.
