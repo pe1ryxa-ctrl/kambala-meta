@@ -29,6 +29,8 @@
 |---|---|---|
 | `fbclock.py` (тут) | годинник на `/dev/fb0` RPi 5 (DejaVu 300 px, `ХХ:СС` + мс окремим рядком, по центру) | 1, 5 — читання цифр оком/камерою |
 | `flash.py` (тут) | спалахи fb чорне/біле + приймання тієї ж картинки через довільну голову GStreamer на тому ж хості; медіана/p10/p90, реальна частота | 1, 1+2, 1+2+3 (петля через VPS) |
+| `rmflash.py` (тут) | спалахи на екрані РМ (labwc або `kmssink` через `RMFLASH_SINK`), приймання з V399, підключеного до РМ; `RMFLASH_FMT=i420`, `RMFLASH_ROI` для кількох екранів у кадрі | 5 (показ), 1 на РМ |
+| `rm_kms_flash.sh` / `rm_asus_flash.sh` (тут) | пари labwc / без композитора на ASUS і Daewoo; тимчасове правило labwc із копією `rc.xml` і відновленням сесії | 5 |
 | `workstation/deploy/latency/codesrc.py` (KWS-044, `fallback/kws-044`) | цифрове джерело 720×576@25 з кодом часу; `serve` — RTSP на місці node-sim | 2, 3, 4 |
 | `workstation/deploy/latency/framestamp.py` | читає код часу з потоку, CSV зі зсувами годинників | 2, 3, 4 |
 | `workstation/deploy/latency/measure.sh` | `ntp` (зсув хоста), `seg N`, `table` | усі |
