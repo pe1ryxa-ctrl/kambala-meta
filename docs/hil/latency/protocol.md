@@ -156,3 +156,16 @@ fast_hwjpeg_hwenc_cbr (+ video_bitrate_mode=1): n=60 mean=167.3 [163.3..172.0] m
 fast_swjpeg_x264: no detections (frames=1704) — перевірити окремо
 ```
 **Знахідка: апаратний декодер JPEG (`v4l2jpegdec`) на RPi 4 додає ≈ 32 мс; програмний `jpegdec` швидший.** Кодер x264 і `v4l2h264enc` рівні. CBR гірше. Після серії camserve перезапущено з `jpegdec + v4l2h264enc`.
+
+## 2026-10-02 15:38–15:50 — UDP від VPS до вузла; Daewoo проти Caps Lock
+Камера `camserve` — jpegdec + v4l2h264enc. VPS: `vps_mtx_variant.sh transport udp` (node/sim `rtspTransport: udp`, перезапуск mediamtx).
+```
+udp_swjpeg_hwenc (g2g «половинки», N=60): mean=122.0 median=120.0 p10=120.0 p90=160.0 sd=18.5 | arrival_diff_mean=120.4
+```
+UDP проти TCP (122,0): **на чистому дротовому каналі різниці немає**.
+
+Клавіатуру перепідключено: світлодіод тепер `input9::capslock`, ROI 0.330,0.775,0.342,0.794 (`ledfind.py`). Спалах на Daewoo поверх Flight Display (штатне правило gst-launch → HDMI-A-2). ROI спалаху — права половина Daewoo зі знімка `led_dw_snap`: 0.855,0.72,0.93,0.92.
+```
+led_dw2 (Daewoo проти світлодіода): n=120/120 mean=38.7 median=40.0 p10=0.0 p90=80.0 sd=26.8 | arrival_diff_mean=38.3
+```
+**Дисплей Daewoo ≈ 39 мс** [±5], ASUS ≈ 45 мс [±2,3] — у межах точності однакові.
