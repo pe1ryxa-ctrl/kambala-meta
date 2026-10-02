@@ -44,3 +44,48 @@ v020tear_labwc_asus_720: n=40/40 median=102.1 p10=84.9 p90=118.8 min=65.5 max=16
 v020tear_labwc_asus_native: n=40/40 median=135.9 p10=114.5 p90=168.9 min=103.7 max=227.2 fps_real=25.0
 ```
 Стан після серії: labwc 0.20.1 лишається на РМ-1, allowTearing вимкнено (rc.xml = копія).
+
+## 2026-10-02 12:55–13:21 — блоковий замір показу на Daewoo (пілот), labwc 0.20.1
+Стенд: РМ-1 (RPi 4), labwc 0.20.1, V399 на РМ 640x480@30 → jpegdec (25 к/с), ROI Daewoo 0.70,0.74,0.96,0.95, кадр I420 720×576. Чергування 10 блоків по 50: labwc / labwc+`allowTearing=fullscreenForced` / `kmssink connector-id=44` (labwc зупинено). Скрипт `rm_display_blocks.sh blk2` (BLOCKS=10 PB=50), підсумок `latpool.py` — середнє, 95% ДІ bootstrap. Блок 6 labwc/tear: мало детекцій (10/50, 6/50) і викид 664 мс — ймовірно, збій показу після перезапуску сесії; у підсумку залишено.
+```
+blk2_labwc_b1: n=50/50 median=111.5 p10=84.8 p90=144.4 min=73.7 max=156.0 fps_real=25.0
+blk2_tear_b1: n=50/50 median=118.6 p10=82.1 p90=131.9 min=55.6 max=139.6 fps_real=25.0
+blk2_kms_b1: n=50/50 median=101.4 p10=85.2 p90=122.9 min=68.6 max=136.5 fps_real=25.0
+blk2_labwc_b2: n=50/50 median=113.6 p10=88.5 p90=133.9 min=68.2 max=144.1 fps_real=25.0
+blk2_tear_b2: n=50/50 median=112.2 p10=89.8 p90=129.1 min=75.6 max=168.1 fps_real=25.0
+blk2_kms_b2: n=50/50 median=101.8 p10=81.6 p90=120.2 min=65.1 max=131.3 fps_real=25.0
+blk2_labwc_b3: n=50/50 median=117.0 p10=92.8 p90=133.4 min=66.2 max=178.0 fps_real=25.0
+blk2_tear_b3: n=50/50 median=110.0 p10=82.0 p90=134.0 min=69.2 max=151.4 fps_real=25.0
+blk2_kms_b3: n=50/50 median=97.1 p10=84.8 p90=116.1 min=68.6 max=136.6 fps_real=25.0
+blk2_labwc_b4: n=50/50 median=110.3 p10=87.2 p90=142.0 min=66.9 max=183.1 fps_real=24.8
+blk2_tear_b4: n=50/50 median=114.6 p10=89.7 p90=139.1 min=66.9 max=161.2 fps_real=25.0
+blk2_kms_b4: n=50/50 median=98.5 p10=82.8 p90=118.3 min=65.9 max=130.4 fps_real=25.0
+blk2_labwc_b5: n=50/50 median=106.6 p10=87.2 p90=135.7 min=76.8 max=140.0 fps_real=25.0
+blk2_tear_b5: n=50/50 median=108.7 p10=81.7 p90=135.0 min=70.0 max=141.6 fps_real=25.0
+blk2_kms_b5: n=50/50 median=104.6 p10=84.1 p90=121.0 min=63.7 max=130.0 fps_real=25.0
+blk2_labwc_b6: n=10/50 median=113.7 p10=97.8 p90=664.4 min=92.6 max=664.4 fps_real=25.0
+blk2_tear_b6: n=6/50 median=128.5 p10=93.2 p90=141.4 min=93.2 max=141.4 fps_real=25.0
+blk2_kms_b6: n=50/50 median=100.6 p10=81.2 p90=116.0 min=70.0 max=139.9 fps_real=25.0
+blk2_labwc_b7: n=50/50 median=115.4 p10=95.3 p90=133.1 min=66.4 max=165.4 fps_real=25.0
+blk2_tear_b7: n=50/50 median=111.8 p10=99.3 p90=143.6 min=87.9 max=148.9 fps_real=25.0
+blk2_kms_b7: n=50/50 median=100.9 p10=76.1 p90=128.8 min=63.0 max=150.9 fps_real=25.0
+blk2_labwc_b8: n=50/50 median=111.4 p10=92.7 p90=131.8 min=75.5 max=154.0 fps_real=24.9
+blk2_tear_b8: n=50/50 median=112.2 p10=83.8 p90=134.9 min=72.6 max=158.2 fps_real=25.0
+blk2_kms_b8: n=50/50 median=101.6 p10=74.1 p90=121.4 min=66.8 max=136.5 fps_real=25.0
+blk2_labwc_b9: n=50/50 median=106.3 p10=85.5 p90=131.6 min=76.1 max=165.5 fps_real=24.9
+blk2_tear_b9: n=50/50 median=106.1 p10=89.1 p90=136.3 min=78.0 max=152.8 fps_real=25.0
+blk2_kms_b9: n=50/50 median=97.3 p10=85.0 p90=125.1 min=72.0 max=132.5 fps_real=25.0
+blk2_labwc_b10: n=50/50 median=107.3 p10=84.0 p90=134.2 min=77.1 max=144.5 fps_real=25.0
+blk2_tear_b10: n=50/50 median=105.6 p10=88.4 p90=132.5 min=72.4 max=151.6 fps_real=25.0
+blk2_kms_b10: n=50/50 median=103.7 p10=82.5 p90=128.5 min=72.9 max=133.9 fps_real=24.9
+rc.xml = копія
+blk2_labwc.raw: n=460 mean=113.7 [110.8..117.4] median=111.5 sd=37.1
+blk2_tear.raw: n=456 mean=111.2 [109.5..112.8] median=111.9 sd=18.5  vs blk2_labwc.raw: -2.6 [-6.6..+1.0]
+blk2_kms.raw: n=500 mean=101.1 [99.7..102.5] median=100.5 sd=15.8  vs blk2_labwc.raw: -12.7 [-16.7..-9.3]
+30387 labwc
+active
+active
+DONE
+
+```
+Стан після серії: rc.xml = копія, labwc 0.20.1 запущено, kambala-display / kambala-outputs — active.
